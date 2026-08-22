@@ -1113,3 +1113,81 @@ body, html {
   background: var(--neon-cyan);
   border-radius: 2px;
 }
+
+/* MOBILE RESPONSIVE SCALING & ADAPTABILITY */
+@media (max-width: 768px) {
+  .neon-title {
+    font-size: 2.8rem !important;
+    letter-spacing: 4px !important;
+  }
+  .neon-subtitle {
+    font-size: 0.85rem !important;
+    letter-spacing: 3px !important;
+  }
+  .garage-container {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    max-height: 72vh !important;
+  }
+  .upgrades-list-container, .weapons-grid {
+    max-height: 220px !important;
+  }
+  .settings-form {
+    padding: 15px !important;
+    gap: 12px !important;
+  }
+  .tutorial-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .choice-card {
+    padding: 12px !important;
+  }
+  .hud-group {
+    padding: 8px !important;
+  }
+  .hud-top-left {
+    width: 140px !important;
+    top: 10px !important;
+    left: 10px !important;
+  }
+  .hud-top-right {
+    width: 140px !important;
+    top: 10px !important;
+    right: 10px !important;
+  }
+  .hud-top-center {
+    top: 10px !important;
+    min-width: 110px !important;
+  }
+  .hud-bottom-left {
+    width: 140px !important;
+    bottom: 10px !important;
+    left: 10px !important;
+  }
+  .hud-bottom-right {
+    width: 140px !important;
+    bottom: 10px !important;
+    right: 10px !important;
+  }
+  .hud-bar-container span {
+    display: none !important; /* Hide number details on mobile to save space */
+  }
+  .hud-bar-container label {
+    font-size: 0.65rem !important;
+  }
+  .bar-outer {
+    height: 8px !important;
+  }
+  #hud-wave-title {
+    font-size: 1.1rem !important;
+  }
+  #hud-enemies-left {
+    font-size: 0.75rem !important;
+  }
+  #hud-speedometer {
+    font-size: 1.0rem !important;
+  }
+  #hud-weapon-name {
+    font-size: 0.8rem !important;
+  }
+}

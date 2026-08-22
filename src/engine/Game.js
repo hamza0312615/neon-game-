@@ -710,7 +710,14 @@ export class Game {
 
   // CORE RENDER ROUTINE
   render() {
-    this.ctx.fillStyle = '#050510';
+    // 1. Draw rich radial background centered on screen
+    const grad = this.ctx.createRadialGradient(
+      this.canvas.width / 2, this.canvas.height / 2, 10,
+      this.canvas.width / 2, this.canvas.height / 2, Math.max(this.canvas.width, this.canvas.height) * 0.75
+    );
+    grad.addColorStop(0, '#0d0d29'); // glowing dark violet center
+    grad.addColorStop(1, '#020206'); // black edge
+    this.ctx.fillStyle = grad;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Render static grid, parallax, background signs, stars
@@ -747,13 +754,23 @@ export class Game {
       e.render(this.ctx);
     }
 
-    // Render projectiles
+    // Render projectiles with screen blend glow
+    this.ctx.save();
+    if (this.saveData.settings.glowEnabled) {
+      this.ctx.globalCompositeOperation = 'screen';
+    }
     for (let p of this.projectiles) {
       p.render(this.ctx);
     }
+    this.ctx.restore();
 
-    // Render particles
+    // Render particles with screen blend glow
+    this.ctx.save();
+    if (this.saveData.settings.glowEnabled) {
+      this.ctx.globalCompositeOperation = 'screen';
+    }
     this.particles.render(this.ctx);
+    this.ctx.restore();
 
     // Render floating damage indicators
     this.uiEffects.render(this.ctx);
@@ -768,6 +785,11 @@ export class Game {
 
     // Render HUD Minimap (radar) on top of screen
     this.renderMinimap();
+    
+    // Draw touch controls in screen-space if active
+    if (this.input.touchActive) {
+      this.renderTouchControls();
+    }
     
     // Render FPS monitor in corner if debug mode
     if (this.debugMode) {
@@ -915,6 +937,75 @@ export class Game {
     this.ctx.fillText(`PARTICLES: ${this.particles.particles.length}`, 20, this.canvas.height - 55);
     this.ctx.fillText(`COORDS: X ${Math.round(this.player?.x || 0)} Y ${Math.round(this.player?.y || 0)}`, 20, this.canvas.height - 40);
     this.ctx.fillText(`TIME: ${this.survivalTime.toFixed(1)}s`, 20, this.canvas.height - 25);
+    this.ctx.restore();
+  }
+
+  renderTouchControls() {
+    this.ctx.save();
+    
+    // Left side: Movement Joystick
+    if (this.input.joystick.active) {
+      const j = this.input.joystick;
+      
+      // Outer base
+      this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
+      this.ctx.lineWidth = 3;
+      this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 10 : 0;
+      this.ctx.shadowColor = 'var(--neon-cyan)';
+      
+      this.ctx.beginPath();
+      this.ctx.arc(j.startX, j.startY, 50, 0, Math.PI*2);
+      this.ctx.stroke();
+      
+      // Inner handle
+      this.ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
+      this.ctx.beginPath();
+      this.ctx.arc(j.curX, j.curY, 20, 0, Math.PI*2);
+      this.ctx.fill();
+    }
+
+    // Right side: Boost & Fire Buttons
+    const rect = this.canvas.getBoundingClientRect();
+    const bx = rect.width - 90;
+    const by = rect.height - 90;
+    
+    // Firing Touch Area Indicator
+    this.ctx.strokeStyle = this.input.shootBtn.active ? 'var(--neon-green)' : 'rgba(57, 255, 20, 0.3)';
+    this.ctx.fillStyle = this.input.shootBtn.active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(0, 0, 0, 0.4)';
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = 'var(--neon-green)';
+    this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 8 : 0;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(bx, by, 35, 0, Math.PI*2);
+    this.ctx.fill();
+    this.ctx.stroke();
+    
+    this.ctx.fillStyle = '#fff';
+    this.ctx.font = 'bold 11px Orbitron';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.shadowBlur = 0;
+    this.ctx.fillText("FIRE", bx, by);
+
+    // Boost Touch Area Indicator
+    const tbx = rect.width - 90;
+    const tby = rect.height - 180;
+    
+    this.ctx.strokeStyle = this.input.boostBtn.active ? 'var(--neon-yellow)' : 'rgba(255, 234, 0, 0.3)';
+    this.ctx.fillStyle = this.input.boostBtn.active ? 'rgba(255, 234, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)';
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = 'var(--neon-yellow)';
+    this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 8 : 0;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(tbx, tby, 28, 0, Math.PI*2);
+    this.ctx.fill();
+    this.ctx.stroke();
+    
+    this.ctx.fillStyle = '#fff';
+    this.ctx.fillText("BOOST", tbx, tby);
+    
     this.ctx.restore();
   }
 

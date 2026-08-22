@@ -90,12 +90,12 @@ export class Player {
     // Shield recharge per sec: Lvl 1 = 5, Lvl 10 = 14
     this.shieldRechargeRate = getVal('shield', 5, 1);
 
-    // Engine Speed: Lvl 1 = 300 max, Lvl 10 = 480 max
-    this.baseMaxSpeed = getVal('engine', 300, 20);
+    // Engine Speed: Lvl 1 = 320 max, Lvl 10 = 500 max (slight speed boost)
+    this.baseMaxSpeed = getVal('engine', 320, 20);
     this.maxSpeed = this.baseMaxSpeed;
 
-    // Engine Acceleration: Lvl 1 = 400, Lvl 10 = 850
-    this.accelerationRate = getVal('engine', 400, 50);
+    // Engine Acceleration: Lvl 1 = 560, Lvl 10 = 1010 (snappier speed up)
+    this.accelerationRate = getVal('engine', 560, 50);
 
     // Boost Capacity: Lvl 1 = 100, Lvl 10 = 235
     this.maxBoostEnergy = getVal('boost', 100, 15);
@@ -104,8 +104,8 @@ export class Player {
     // Boost Recharge Rate: Lvl 1 = 15, Lvl 10 = 42 per second
     this.boostRechargeRate = getVal('boost', 15, 3);
 
-    // Handling: Lvl 1 = 3.5 turn rate, Lvl 10 = 5.3 turn rate
-    this.turnSpeed = getVal('handling', 3.5, 0.2);
+    // Handling: Lvl 1 = 4.5 turn rate, Lvl 10 = 6.3 turn rate (snappier steering)
+    this.turnSpeed = getVal('handling', 4.5, 0.2);
     // Drift control slides (drift slip value): lower level slides more, higher level grips better
     this.driftGrip = 0.90 + ((this.upgrades.handling - 1) * 0.007); // Lvl 1 = 0.90, Lvl 10 = 0.963
 
@@ -325,7 +325,7 @@ export class Player {
       throttle = 1.0;
       if (this.tutorialActive) this.game.advanceTutorial(0);
     } else if (input.isReversing()) {
-      throttle = -0.5; // slower reverse speed
+      throttle = -1.0; // faster braking / reverse speed
       if (this.tutorialActive) this.game.advanceTutorial(0);
     }
 
@@ -353,7 +353,8 @@ export class Player {
     if (nextSpeedForward < -this.maxSpeed * 0.4) nextSpeedForward = -this.maxSpeed * 0.4;
 
     // Apply natural rolling resistance (friction)
-    const rollingResistance = 0.35;
+    // Tighter engine braking when releasing throttle, heavier braking on reversing
+    const rollingResistance = throttle === 0 ? 0.85 : (throttle < 0 ? 1.6 : 0.25);
     nextSpeedForward *= (1 - rollingResistance * dt);
 
     // Apply lateral grip constraints (sideways friction)
@@ -435,15 +436,69 @@ export class Player {
       });
     }
 
-    // 8. Aim turret independently
-    const mouseWorld = this.game.camera.screenToWorld(input.mouse.x, input.mouse.y);
-    const aimDx = mouseWorld.x - this.x;
-    const aimDy = mouseWorld.y - this.y;
-    const targetTurretAngle = Math.atan2(aimDy, aimDx);
+    // 8. Aim turret independently (With Smart Auto-Aim)
+    // Track mouse movement to determine manual vs auto-aim
+    const mouseMoved = this.lastMouseX !== undefined && 
+                       (Math.abs(input.mouse.x - this.lastMouseX) > 2 || 
+                        Math.abs(input.mouse.y - this.lastMouseY) > 2);
     
-    // Smoothly rotate turret
+    this.lastMouseX = input.mouse.x;
+    this.lastMouseY = input.mouse.y;
+
+    if (mouseMoved || input.mouse.isDown) {
+      this.manualAimTimer = 1.8; // keep manual aiming for 1.8 seconds after mouse movement
+    } else if (this.manualAimTimer > 0) {
+      this.manualAimTimer -= dt;
+    }
+
+    let targetTurretAngle = this.angle;
+    
+    // Find closest enemy within range
+    let closestEnemy = null;
+    let minDist = 750; // max auto-aim range
+    for (let e of this.game.enemies) {
+      if (e.isDead) continue;
+      const d = Math.hypot(e.x - this.x, e.y - this.y);
+      if (d < minDist) {
+        minDist = d;
+        closestEnemy = e;
+      }
+    }
+
+    if (input.touchActive) {
+      // Touch: Auto-aim closest enemy. If aiming by touching the right side, manual override.
+      const rect = this.game.canvas.getBoundingClientRect();
+      const hasTouchAim = input.mouse.screenX >= rect.width * 0.45;
+      
+      if (hasTouchAim) {
+        const mouseWorld = this.game.camera.screenToWorld(input.mouse.x, input.mouse.y);
+        targetTurretAngle = Math.atan2(mouseWorld.y - this.y, mouseWorld.x - this.x);
+      } else if (closestEnemy) {
+        targetTurretAngle = Math.atan2(closestEnemy.y - this.y, closestEnemy.x - this.x);
+      } else {
+        targetTurretAngle = this.angle;
+      }
+    } else {
+      // Desktop: Manual mouse aim if moving mouse or shooting, otherwise auto-lock nearest
+      if (this.manualAimTimer > 0) {
+        const mouseWorld = this.game.camera.screenToWorld(input.mouse.x, input.mouse.y);
+        targetTurretAngle = Math.atan2(mouseWorld.y - this.y, mouseWorld.x - this.x);
+      } else if (closestEnemy) {
+        targetTurretAngle = Math.atan2(closestEnemy.y - this.y, closestEnemy.x - this.x);
+      } else {
+        // Point in direction of velocity vector if moving, otherwise face car angle
+        const speed = Math.hypot(this.vx, this.vy);
+        if (speed > 20) {
+          targetTurretAngle = Math.atan2(this.vy, this.vx);
+        } else {
+          targetTurretAngle = this.angle;
+        }
+      }
+    }
+    
+    // Smoothly rotate turret towards target angle
     const angleDiff = Math.atan2(Math.sin(targetTurretAngle - this.turretAngle), Math.cos(targetTurretAngle - this.turretAngle));
-    const turretRotateSpeed = 8.0; // Lerp factor
+    const turretRotateSpeed = 9.0; // Lerp speed
     this.turretAngle += angleDiff * turretRotateSpeed * dt;
 
     // 9. SHOOTING SYSTEM TRIGGER

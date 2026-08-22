@@ -10,7 +10,10 @@ export class Camera {
     // Zoom configurations
     this.zoom = 1;
     this.targetZoom = 1;
+    this.baseZoom = 1;
     this.zoomSpeed = 2; // zoom change Lerp speed
+    this.calculateBaseZoom();
+    this.zoom = this.baseZoom;
     
     // Smooth follow configurations
     this.lerpSpeed = 0.08; // Lerp factor
@@ -35,6 +38,14 @@ export class Camera {
   resize(width, height) {
     this.width = width;
     this.height = height;
+    this.calculateBaseZoom();
+  }
+
+  calculateBaseZoom() {
+    const size = Math.min(this.width, this.height);
+    // Base reference size is 850px.
+    this.baseZoom = Math.max(0.75, Math.min(1.45, size / 850));
+    this.targetZoom = this.baseZoom;
   }
 
   addTrauma(amount) {

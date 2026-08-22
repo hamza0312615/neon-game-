@@ -286,8 +286,23 @@ export class Arena {
     const endY = startY + camera.height + gridSpacing;
 
     ctx.save();
+
+    // Render parallax background skyscrapers in the distance!
+    ctx.strokeStyle = 'rgba(189, 0, 255, 0.08)'; // purple skyline
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 8; i++) {
+      const bx = ((i * 450 - camera.x * 0.15) % (camera.width + 400)) - 200;
+      const bHeight = 120 + (i % 3) * 110;
+      const bWidth = 90 + (i % 2) * 60;
+      ctx.strokeRect(bx, camera.height - bHeight, bWidth, bHeight);
+      
+      // Draw a few window rows inside skyscrapers
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.02)';
+      ctx.fillRect(bx + 10, camera.height - bHeight + 10, bWidth - 20, bHeight - 20);
+    }
+
     ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.04)'; // faint neon grid lines
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)'; // brighter grid lines
 
     ctx.beginPath();
     // Vertical grid lines
@@ -306,8 +321,21 @@ export class Arena {
     }
     ctx.stroke();
 
+    // Draw little intersection crosses to make the grid pop
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+    for (let x = startX; x <= endX; x += gridSpacing) {
+      if (x < 0 || x > this.width) continue;
+      for (let y = startY; y <= endY; y += gridSpacing) {
+        if (y < 0 || y > this.height) continue;
+        const screenX = (x - camera.x) * camera.zoom;
+        const screenY = (y - camera.y) * camera.zoom;
+        ctx.fillRect(screenX - 4, screenY - 0.5, 8, 1);
+        ctx.fillRect(screenX - 0.5, screenY - 4, 1, 8);
+      }
+    }
+
     // Parallax Star/Dust particles (subtle tech particles floating)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; // brighter floating stars
     for (let i = 0; i < 40; i++) {
       // simple deterministic starfield based on screen grid quadrants
       const sx = ((i * 12345) % camera.width);
