@@ -185,7 +185,7 @@ export class Game {
 
     // Skip Tutorial Overlay
     bindBtn('btn-skip-tut', () => {
-      document.getElementById('tutorial-overlay').classList.add('hidden');
+      document.getElementById('tutorial-overlay')?.classList.add('hidden');
       if (this.tutorialActive) {
         this.tutorialActive = false;
         this.saveData.progression.completedTutorial = true;
@@ -368,23 +368,27 @@ export class Game {
     this.waveManager.startWave();
 
     // Trigger interactive tutorial for new players
-    if (!this.saveData.progression.completedTutorial) {
+    const tutOverlay = document.getElementById('tutorial-overlay');
+    if (!this.saveData.progression.completedTutorial && tutOverlay) {
       this.tutorialStep = 0;
       this.tutorialActive = true;
-      document.getElementById('tutorial-overlay').classList.remove('hidden');
+      tutOverlay.classList.remove('hidden');
       this.updateTutorialOverlay();
     } else {
       this.tutorialActive = false;
-      document.getElementById('tutorial-overlay').classList.add('hidden');
+      if (tutOverlay) tutOverlay.classList.add('hidden');
     }
   }
 
   updateTutorialOverlay() {
+    const tutOverlay = document.getElementById('tutorial-overlay');
+    if (!tutOverlay) return;
+
     const tutorialSteps = [
-      "Drive using the W, A, S, D keys or Arrows.",
-      "Move your mouse to aim the weapon turret, and click / hold SPACE to fire.",
-      "Hold LEFT SHIFT to turbo boost away from threats.",
-      "Destroy enemies to gather XP and levels. Level ups pause the arena for bonus perks!"
+      "Drive using W, A, S, D or Arrow keys.",
+      "Aim with Mouse, click or hold SPACE to fire.",
+      "Hold LEFT SHIFT to turbo boost.",
+      "Destroy hostiles to gather XP and Level Up!"
     ];
     
     const dots = document.querySelectorAll('.tut-progress-dots .dot');
@@ -392,7 +396,8 @@ export class Game {
       d.classList.toggle('active', i === this.tutorialStep);
     });
 
-    document.getElementById('tut-instruction').innerText = tutorialSteps[this.tutorialStep];
+    const instEl = document.getElementById('tut-instruction');
+    if (instEl) instEl.innerText = tutorialSteps[this.tutorialStep] || '';
   }
 
   advanceTutorial(step) {
@@ -400,7 +405,8 @@ export class Game {
     this.tutorialStep++;
     if (this.tutorialStep >= 4) {
       this.tutorialActive = false;
-      document.getElementById('tutorial-overlay').classList.add('hidden');
+      const tutOverlay = document.getElementById('tutorial-overlay');
+      if (tutOverlay) tutOverlay.classList.add('hidden');
       this.saveData.progression.completedTutorial = true;
       SaveSystem.save(this.saveData);
     } else {
