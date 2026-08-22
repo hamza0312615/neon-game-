@@ -51,10 +51,8 @@ export class Enemy {
     this.damageFlash = 0.15;
     this.game.audio.playHit();
     
-    // Floating damage numbers
-    if (this.game?.saveData?.settings?.damageNumbersEnabled ?? true) {
-      this.game.uiEffects.spawnDamageFloat(this.x, this.y, Math.round(amount), isCrit);
-    }
+    // Always spawn floating damage numbers on every hit!
+    this.game.uiEffects.spawnDamageFloat(this.x, this.y - 10, Math.round(amount), isCrit);
     
     // Spark effects
     this.game.particles.spawnSparkDebris(this.x, this.y, isCrit ? 10 : 5, isCrit ? 'var(--neon-yellow)' : this.color);
@@ -293,15 +291,15 @@ export class Enemy {
     ctx.shadowBlur = 0;
     ctx.restore();
 
-    // Draw overhead HP Bar if damaged
-    if (this.hp < this.maxHp) {
+    // Draw overhead HP Bar (Always visible over enemies!)
+    if (this.hp > 0) {
       ctx.save();
-      const barW = Math.max(28, this.radius * 1.8);
-      const barH = 4;
+      const barW = Math.max(34, this.radius * 2.0);
+      const barH = 5;
       const bx = this.x - barW / 2;
-      const by = this.y - this.radius - 12;
+      const by = this.y - this.radius - 14;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
       ctx.fillRect(bx - 1, by - 1, barW + 2, barH + 2);
 
       const ratio = Math.max(0, this.hp / this.maxHp);

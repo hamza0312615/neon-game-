@@ -1,17 +1,17 @@
 :root {
   --neon-cyan: #00f0ff;
-  --neon-magenta: #ff007f;
+  --neon-magenta: #00e5ff;
   --neon-yellow: #ffea00;
-  --neon-purple: #bd00ff;
+  --neon-purple: #00a2ff;
   --neon-red: #ff003c;
   --neon-green: #39ff14;
-  --dark-bg: #050510;
-  --dark-panel: rgba(10, 10, 25, 0.85);
-  --glow-shadow-cyan: 0 0 10px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.2);
-  --glow-shadow-magenta: 0 0 10px rgba(255, 0, 127, 0.5), 0 0 20px rgba(255, 0, 127, 0.2);
-  --glow-shadow-yellow: 0 0 10px rgba(255, 234, 0, 0.5), 0 0 20px rgba(255, 234, 0, 0.2);
-  --glow-shadow-purple: 0 0 10px rgba(189, 0, 255, 0.5), 0 0 20px rgba(189, 0, 255, 0.2);
-  --glow-shadow-green: 0 0 10px rgba(57, 255, 20, 0.5), 0 0 20px rgba(57, 255, 20, 0.2);
+  --dark-bg: #030a1c;
+  --dark-panel: rgba(3, 15, 35, 0.90);
+  --glow-shadow-cyan: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.3);
+  --glow-shadow-magenta: 0 0 10px rgba(0, 229, 255, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+  --glow-shadow-yellow: 0 0 10px rgba(255, 234, 0, 0.6), 0 0 20px rgba(255, 234, 0, 0.3);
+  --glow-shadow-purple: 0 0 10px rgba(0, 162, 255, 0.6), 0 0 20px rgba(0, 162, 255, 0.3);
+  --glow-shadow-green: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.3);
   --font-title: 'Orbitron', sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
 }

@@ -284,4 +284,15 @@ export class WaveManager {
       this.game.particles.spawnShieldPulse(sx, sy, e.radius + 15, e.color);
     }
   }
+
+  spawnBossNow() {
+    this.waveActive = true;
+    const scale = 1.0 + (this.waveNumber - 1) * 0.18;
+    const bosses = ['titan', 'void_racer', 'omega_core'];
+    const chosen = bosses[Math.floor(Math.random() * bosses.length)];
+    
+    this.spawnEnemy(chosen, scale);
+    this.game.uiEffects.spawnScoreFloat(this.game.player.x, this.game.player.y - 60, `⚠️ BOSS DETECTED!`, 'var(--neon-yellow)');
+    this.game.audio.playExplosion(true);
+  }
 }

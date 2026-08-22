@@ -156,6 +156,17 @@ export class Game {
     bindBtn('btn-gameover-garage', () => this.changeState('GARAGE'));
     bindBtn('btn-gameover-menu', () => this.changeState('MENU'));
 
+    // Boss Summoning listeners (Click Wave title or press 'B')
+    bindBtn('hud-wave-title', () => {
+      if (this.state === 'PLAYING') this.waveManager.spawnBossNow();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyB' && this.state === 'PLAYING') {
+        this.waveManager.spawnBossNow();
+      }
+    });
+
     // Victory Buttons
     bindBtn('btn-victory-garage', () => this.changeState('GARAGE'));
     bindBtn('btn-victory-menu', () => this.changeState('MENU'));
