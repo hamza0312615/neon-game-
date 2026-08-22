@@ -152,19 +152,19 @@ export class Player {
     // Generate 3 random perks
     const pool = [
       {
-        title: "KINETIC OVERLOAD",
+        title: "💥 KINETIC OVERLOAD",
         description: "Increase projectile damage by 20%.",
         bonusText: "+20% DAMAGE",
         action: (p) => p.damageMultiplier += 0.2
       },
       {
-        title: "HYPERCOOLING CHASSIS",
+        title: "🔥 HYPERCOOLING CHASSIS",
         description: "Reduce weapon cooldown/increase fire rate.",
         bonusText: "+15% FIRE RATE",
         action: (p) => p.fireRateMultiplier += 0.15
       },
       {
-        title: "LIGHTNING INJECTORS",
+        title: "🚀 LIGHTNING INJECTORS",
         description: "Increase maximum vehicle driving speed.",
         bonusText: "+12% SPEED",
         action: (p) => {
@@ -173,19 +173,19 @@ export class Player {
         }
       },
       {
-        title: "REACTION MATRIX",
+        title: "🎯 REACTION MATRIX",
         description: "Improve critical hit chance of all guns.",
         bonusText: "+8% CRITICAL CHANCE",
         action: (p) => p.criticalChanceMultiplier += 0.08
       },
       {
-        title: "NANO-REINFORCED PLATING",
+        title: "🛡️ NANO-REINFORCED PLATING",
         description: "Reduce all incoming hull damage by 5%.",
         bonusText: "+5% ARMOR ABS",
         action: (p) => p.armorReduction = Math.max(0.3, p.armorReduction - 0.05)
       },
       {
-        title: "SHIELD MATRIX STACK",
+        title: "⚡ SHIELD MATRIX STACK",
         description: "Increase shield capacity immediately.",
         bonusText: "+30 SHIELD CAP",
         action: (p) => {
@@ -194,13 +194,13 @@ export class Player {
         }
       },
       {
-        title: "CELL REPAIR FIELD",
+        title: "💖 CELL REPAIR FIELD",
         description: "Regenerate 15 Hull integrity points.",
         bonusText: "+15 HP REPAIR",
         action: (p) => p.hp = Math.min(p.maxHp, p.hp + 15)
       },
       {
-        title: "MAGNETIC PULSER",
+        title: "🧲 MAGNETIC PULSER",
         description: "Permanently extend item pick up range.",
         bonusText: "+40 PX RADIUS",
         action: (p) => p.pickupRadius += 40
@@ -588,142 +588,170 @@ export class Player {
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
 
-    // Draw suspension shadows/reflection
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.beginPath();
-    ctx.arc(0, 4, this.radius, 0, Math.PI*2);
-    ctx.fill();
-
-    // Resolve neon variables
+    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
     const colorCyan = resolveColor('var(--neon-cyan)');
     const colorMagenta = resolveColor('var(--neon-magenta)');
+    const colorYellow = resolveColor('var(--neon-yellow)');
     const colorRed = resolveColor('var(--neon-red)');
 
-    // 1. Draw Wheels with Animated Spinning Tread Lines
-    ctx.fillStyle = '#0f0f18';
-    ctx.strokeStyle = colorCyan;
-    ctx.lineWidth = 1;
-    
+    // 0. Neon Ground Underglow Aura (Glows vibrant cyan, gold on boost, red on damage)
+    let underglowColor = 'rgba(0, 243, 255, 0.45)';
+    if (this.powerups.overdrive > 0) underglowColor = 'rgba(255, 204, 0, 0.75)';
+    else if (this.isBoosting) underglowColor = 'rgba(255, 204, 0, 0.65)';
+    else if (this.damageFlash > 0) underglowColor = 'rgba(255, 0, 68, 0.75)';
+
+    const underglowGrad = ctx.createRadialGradient(0, 0, 8, 0, 0, 42);
+    underglowGrad.addColorStop(0, underglowColor);
+    underglowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = underglowGrad;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 42, 28, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 1. Draw Wheels with Animated Spinning Rim Lines & Rubber Treads
     const wheelOffsets = [
-      { x: -16, y: -16 }, { x: 16, y: -16 }, // Front
-      { x: -16, y: 16 }, { x: 16, y: 16 }   // Rear
+      { x: -16, y: -16 }, { x: 16, y: -16 }, // Front left/right
+      { x: -16, y: 16 }, { x: 16, y: 16 }   // Rear left/right
     ];
-    
+
     wheelOffsets.forEach(w => {
       ctx.save();
       ctx.translate(w.x, w.y);
-      ctx.fillRect(-6, -3, 12, 6);
-      ctx.strokeRect(-6, -3, 12, 6);
       
-      // Animated tire tread line spinning with velocity
+      // Rubber tire casing
+      ctx.fillStyle = '#080a14';
       ctx.strokeStyle = colorCyan;
       ctx.lineWidth = 1.2;
-      const spinOffset = (this.wheelAngle % 8) - 4;
+      ctx.fillRect(-7, -4, 14, 8);
+      ctx.strokeRect(-7, -4, 14, 8);
+
+      // Glowing Rim Center
+      ctx.fillStyle = colorCyan;
+      ctx.fillRect(-2, -1.5, 4, 3);
+
+      // Spinning tread line
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      const spinOffset = (this.wheelAngle % 10) - 5;
       ctx.beginPath();
-      ctx.moveTo(spinOffset, -3);
-      ctx.lineTo(spinOffset, 3);
+      ctx.moveTo(spinOffset, -4);
+      ctx.lineTo(spinOffset, 4);
       ctx.stroke();
+
       ctx.restore();
     });
 
-    // 0. Headlight Beam Cones (projecting forward 180px)
+    // 2. Headlight Beam Cones (projecting forward 220px)
     ctx.save();
-    const headGrad = ctx.createRadialGradient(22, 0, 5, 180, 0, 180);
-    headGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
-    headGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.15)');
-    headGrad.addColorStop(1, 'rgba(0, 240, 255, 0)');
+    const headGrad = ctx.createRadialGradient(22, 0, 5, 220, 0, 220);
+    headGrad.addColorStop(0, 'rgba(0, 243, 255, 0.5)');
+    headGrad.addColorStop(0.4, 'rgba(0, 243, 255, 0.15)');
+    headGrad.addColorStop(1, 'rgba(0, 243, 255, 0)');
     ctx.fillStyle = headGrad;
     ctx.beginPath();
     ctx.moveTo(22, 0);
-    ctx.lineTo(180, -45);
-    ctx.lineTo(180, 45);
+    ctx.lineTo(220, -55);
+    ctx.lineTo(220, 55);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
 
-    // 2. Draw Chassis Body (Vibrant Cyan Solid Core + Bold Neon Yellow Border)
+    // 3. Draw Main Chassis Body (Sleek Supercar Geometry)
     if (this.damageFlash > 0 && Math.floor(Date.now() / 50) % 2 === 0) {
       ctx.strokeStyle = '#ffffff';
-      ctx.fillStyle = '#ff003c';
+      ctx.fillStyle = '#ff0044';
     } else {
-      ctx.strokeStyle = '#ffea00'; // Bold Neon Yellow Outline
-      ctx.fillStyle = '#00c8ff';   // Solid Vibrant Electric Cyan Body!
+      ctx.strokeStyle = colorYellow; // Bold Neon Gold Trim
+      ctx.fillStyle = '#00aaff';    // Electric Blue Core Body
     }
-    
-    ctx.lineWidth = 3.0;
-    
-    // Sleek vector car shape path
+
+    ctx.lineWidth = 2.8;
+    ctx.shadowBlur = isGlow ? 16 : 0;
+    ctx.shadowColor = colorCyan;
+
+    // Aerodynamic Chassis Polygon Path
     ctx.beginPath();
-    ctx.moveTo(22, 0);       // nose front
-    ctx.lineTo(14, -13);     // front right
-    ctx.lineTo(-14, -13);    // rear right
-    ctx.lineTo(-20, -7);     // spoiler right
-    ctx.lineTo(-20, 7);      // spoiler left
-    ctx.lineTo(-14, 13);     // rear left
-    ctx.lineTo(14, 13);      // front left
+    ctx.moveTo(26, 0);        // Nose tip
+    ctx.lineTo(16, -14);      // Front Right Splitter
+    ctx.lineTo(4, -16);       // Front Intake Right
+    ctx.lineTo(-12, -15);     // Side Skirt Right
+    ctx.lineTo(-22, -18);     // Rear Spoiler Wing Right
+    ctx.lineTo(-22, -10);     // Rear Bumper Right
+    ctx.lineTo(-20, 0);       // Central Exhaust Notch
+    ctx.lineTo(-22, 10);      // Rear Bumper Left
+    ctx.lineTo(-22, 18);      // Rear Spoiler Wing Left
+    ctx.lineTo(-12, 15);      // Side Skirt Left
+    ctx.lineTo(4, 16);        // Front Intake Left
+    ctx.lineTo(16, 14);       // Front Left Splitter
     ctx.closePath();
-    
-    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
-    ctx.shadowBlur = isGlow ? 15 : 0;
-    ctx.shadowColor = '#00f0ff';
-    
+
     ctx.fill();
     ctx.stroke();
 
-    // Front glowing Headlight dots
-    ctx.fillStyle = '#ffffff';
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = '#ffffff';
-    ctx.fillRect(14, -12, 4, 3);
-    ctx.fillRect(14, 9, 4, 3);
-
-    // Reset shadow for inner details
+    // Glowing Intake Grille Vent Stripes
     ctx.shadowBlur = 0;
+    ctx.fillStyle = colorMagenta;
+    ctx.fillRect(8, -12, 6, 2);
+    ctx.fillRect(8, 10, 6, 2);
 
-    // Glass cockpit details (Glowing White/Cyan Dome)
-    ctx.fillStyle = '#003366';
+    // Front Headlight Bars
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = isGlow ? 10 : 0;
+    ctx.shadowColor = '#ffffff';
+    ctx.fillRect(16, -13, 5, 3);
+    ctx.fillRect(16, 10, 5, 3);
+
+    // Glass Cockpit Canopy (Dark Blue Tinted Glass with White Specular Reflection)
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#021836';
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(8, 0);
-    ctx.lineTo(0, -6);
-    ctx.lineTo(-8, -6);
-    ctx.lineTo(-8, 6);
-    ctx.lineTo(0, 6);
+    ctx.moveTo(10, 0);
+    ctx.lineTo(1, -7);
+    ctx.lineTo(-10, -7);
+    ctx.lineTo(-14, 0);
+    ctx.lineTo(-10, 7);
+    ctx.lineTo(1, 7);
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Booster Exhaust Port (triangle at back)
-    ctx.fillStyle = '#0f0f18';
-    ctx.strokeStyle = colorCyan;
+    // Canopy Specular Highlight Line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(-20, -3);
-    ctx.lineTo(-24, 0);
-    ctx.lineTo(-20, 3);
-    ctx.closePath();
-    ctx.fill();
+    ctx.moveTo(6, -3);
+    ctx.lineTo(-4, -5);
     ctx.stroke();
 
-    // Animated Thruster Jet Flame (Flickering rocket exhaust flame)
+    // Central Reactor Core Eye
+    ctx.fillStyle = colorCyan;
+    ctx.shadowBlur = isGlow ? 8 : 0;
+    ctx.shadowColor = colorCyan;
+    ctx.beginPath();
+    ctx.arc(-2, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 4. Thruster Jet Flame (Flickering Dual Plasma Exhaust)
     const moveSpeed = Math.hypot(this.vx, this.vy);
     if (moveSpeed > 10 || this.isBoosting) {
       ctx.save();
-      const flameLen = (this.isBoosting ? 28 : 14) + Math.random() * 8;
-      
-      const grad = ctx.createLinearGradient(-24, 0, -24 - flameLen, 0);
-      grad.addColorStop(0, '#ffffff');
-      grad.addColorStop(0.3, '#ffea00');
-      grad.addColorStop(1, 'rgba(0, 240, 255, 0)');
-      
-      ctx.fillStyle = grad;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
-      ctx.shadowColor = '#ffea00';
+      const flameLen = (this.isBoosting ? 32 : 16) + Math.random() * 8;
+
+      const flameGrad = ctx.createLinearGradient(-22, 0, -22 - flameLen, 0);
+      flameGrad.addColorStop(0, '#ffffff');
+      flameGrad.addColorStop(0.3, this.powerups.overdrive > 0 ? '#ffcc00' : '#ff007f');
+      flameGrad.addColorStop(1, 'rgba(0, 243, 255, 0)');
+
+      ctx.fillStyle = flameGrad;
+      ctx.shadowBlur = isGlow ? 16 : 0;
+      ctx.shadowColor = colorYellow;
 
       ctx.beginPath();
-      ctx.moveTo(-24, -4);
-      ctx.lineTo(-24 - flameLen, 0);
-      ctx.lineTo(-24, 4);
+      ctx.moveTo(-22, -5);
+      ctx.lineTo(-22 - flameLen, 0);
+      ctx.lineTo(-22, 5);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
@@ -731,75 +759,79 @@ export class Player {
 
     ctx.restore();
 
-    // 3. Draw Turret on top (aims independently)
+    // 5. Draw Turret (rotates independently towards aim vector)
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.turretAngle);
 
-    // Turret Mount Ring (centered)
-    ctx.fillStyle = 'rgba(10, 10, 20, 0.9)';
+    // Turret Base Ring
+    ctx.fillStyle = 'rgba(6, 12, 30, 0.95)';
     ctx.strokeStyle = colorMagenta;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI*2);
+    ctx.arc(0, 0, 11, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Turret barrel gun (with animated recoil kickback!)
-    ctx.fillStyle = '#100f1c';
+    // Dual Gun Barrels with Recoil Kickback
+    ctx.fillStyle = '#080d1a';
     ctx.strokeStyle = colorCyan;
     ctx.lineWidth = 1.5;
-    
-    const recoilX = 4 - this.recoilAnim; // Recoil barrel backwards 7px on fire!
-    ctx.fillRect(recoilX, -3, 16, 6);
-    ctx.strokeRect(recoilX, -3, 16, 6);
-    
-    // Barrel end tip
+
+    const recoilX = 4 - this.recoilAnim;
+    // Top barrel
+    ctx.fillRect(recoilX, -5, 18, 4);
+    ctx.strokeRect(recoilX, -5, 18, 4);
+    // Bottom barrel
+    ctx.fillRect(recoilX, 1, 18, 4);
+    ctx.strokeRect(recoilX, 1, 18, 4);
+
+    // Barrel Muzzle Tips
     ctx.fillStyle = colorCyan;
-    ctx.fillRect(recoilX + 16, -2, 2, 4);
+    ctx.shadowBlur = isGlow ? 8 : 0;
+    ctx.shadowColor = colorCyan;
+    ctx.fillRect(recoilX + 18, -4, 2, 2);
+    ctx.fillRect(recoilX + 18, 2, 2, 2);
 
     ctx.restore();
-    
-    // 4. Shield Overlay Ring (flashes when taking shield hits)
+
+    // 6. Shield Overlay Ring
     if (this.shieldFlash > 0 && this.shield > 0) {
       ctx.save();
-      ctx.strokeStyle = `rgba(0, 240, 255, ${this.shieldFlash * 4})`;
-      ctx.lineWidth = 2;
-      ctx.shadowBlur = isGlow ? 15 : 0;
+      ctx.strokeStyle = `rgba(0, 243, 255, ${this.shieldFlash * 4})`;
+      ctx.lineWidth = 2.5;
+      ctx.shadowBlur = isGlow ? 18 : 0;
       ctx.shadowColor = colorCyan;
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius + 6, 0, Math.PI*2);
+      ctx.arc(this.x, this.y, this.radius + 8, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
 
-    // 5. Draw Lock-On Target Reticle over active auto-aim target!
+    // 7. Lock-On Target Reticle over active auto-aim enemy
     if (this.targetEnemy && !this.targetEnemy.isDead) {
       ctx.save();
       ctx.translate(this.targetEnemy.x, this.targetEnemy.y);
-      
-      const rot = Date.now() * 0.004;
+
+      const rot = Date.now() * 0.005;
       ctx.rotate(rot);
 
-      const colorMagenta = resolveColor('var(--neon-magenta)');
       ctx.strokeStyle = colorMagenta;
       ctx.lineWidth = 2;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
+      ctx.shadowBlur = isGlow ? 12 : 0;
       ctx.shadowColor = colorMagenta;
 
       const r = this.targetEnemy.radius + 12;
 
-      // Outer target ring
       ctx.beginPath();
       ctx.arc(0, 0, r, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Corner target brackets
       ctx.fillStyle = colorMagenta;
-      ctx.fillRect(-2, -r - 4, 4, 6);
-      ctx.fillRect(-2, r - 2, 4, 6);
-      ctx.fillRect(-r - 4, -2, 6, 4);
-      ctx.fillRect(r - 2, -2, 6, 4);
+      ctx.fillRect(-2, -r - 5, 4, 7);
+      ctx.fillRect(-2, r - 2, 4, 7);
+      ctx.fillRect(-r - 5, -2, 7, 4);
+      ctx.fillRect(r - 2, -2, 7, 4);
 
       ctx.restore();
     }

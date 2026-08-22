@@ -364,15 +364,29 @@ export class Grunt extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Sleek delta wedge
+    // Sleek red delta interceptor vehicle
     ctx.beginPath();
-    ctx.moveTo(16, 0);
-    ctx.lineTo(-10, -9);
-    ctx.lineTo(-6, 0);
-    ctx.lineTo(-10, 9);
+    ctx.moveTo(20, 0);        // Front plasma ram tip
+    ctx.lineTo(8, -12);       // Front right wing blade
+    ctx.lineTo(-12, -10);     // Side skirt right
+    ctx.lineTo(-18, -14);     // Rear spoiler right
+    ctx.lineTo(-18, 14);      // Rear spoiler left
+    ctx.lineTo(-12, 10);      // Side skirt left
+    ctx.lineTo(8, 12);        // Front left wing blade
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
+
+    // Red Plasma Optical Eye
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(4, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Dual Rear Exhaust Vents
+    ctx.fillStyle = '#0a0508';
+    ctx.fillRect(-18, -7, 4, 3);
+    ctx.fillRect(-18, 4, 4, 3);
   }
 }
 
@@ -421,22 +435,35 @@ export class Tank extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Giant blocky tank shape
+    // Giant armored battle fortress with dual turrets
     ctx.beginPath();
     ctx.rect(-24, -18, 48, 36);
     ctx.fill();
     ctx.stroke();
-    
-    // Core ring indicator
-    ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI*2);
-    ctx.stroke();
 
-    // Tread lines
-    ctx.fillRect(-28, -22, 10, 4);
-    ctx.fillRect(18, -22, 10, 4);
-    ctx.fillRect(-28, 18, 10, 4);
-    ctx.fillRect(18, 18, 10, 4);
+    // Tread belts left and right
+    ctx.fillStyle = '#06040a';
+    ctx.fillRect(-28, -22, 56, 5);
+    ctx.strokeRect(-28, -22, 56, 5);
+    ctx.fillRect(-28, 17, 56, 5);
+    ctx.strokeRect(-28, 17, 56, 5);
+
+    // Front Ramming Bumper
+    ctx.fillStyle = 'var(--neon-purple)';
+    ctx.fillRect(20, -12, 6, 24);
+
+    // Heavy Central Rotating Core Dome
+    ctx.beginPath();
+    ctx.arc(0, 0, 12, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fill();
+
+    // Twin Cannons extending forward
+    ctx.fillStyle = '#080510';
+    ctx.fillRect(10, -9, 18, 4);
+    ctx.strokeRect(10, -9, 18, 4);
+    ctx.fillRect(10, 5, 18, 4);
+    ctx.strokeRect(10, 5, 18, 4);
   }
 }
 
@@ -526,26 +553,35 @@ export class Sniper extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Sleek long polygonal sniper chassis
+    // High-tech stealth assassin car with long cyber cannon
     ctx.beginPath();
-    ctx.moveTo(22, 0);
-    ctx.lineTo(2, -8);
-    ctx.lineTo(-14, -8);
-    ctx.lineTo(-14, 8);
-    ctx.lineTo(2, 8);
+    ctx.moveTo(26, 0);        // Long cannon tip
+    ctx.lineTo(8, -9);        // Front right angled hood
+    ctx.lineTo(-14, -11);     // Rear right armor plate
+    ctx.lineTo(-20, 0);       // Rear notch
+    ctx.lineTo(-14, 11);      // Rear left armor plate
+    ctx.lineTo(8, 9);         // Front left angled hood
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Long barrel barrel extending
-    ctx.fillRect(8, -1.5, 14, 3);
+    // Long cyber sniper barrel extension
+    ctx.fillStyle = '#080a14';
+    ctx.fillRect(8, -2, 18, 4);
+    ctx.strokeRect(8, -2, 18, 4);
+
+    // Glowing Yellow Scope Lens
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(6, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   drawCustomEffects(ctx) {
     if (this.isCharging && !this.isStunned()) {
       // Draw warning aim laser line
       ctx.save();
-      ctx.strokeStyle = `rgba(255, 0, 60, ${0.1 + (Math.sin(Date.now() * 0.05) * 0.05 + 0.1) * (1 - this.chargeTimer/this.chargeDuration)})`;
+      ctx.strokeStyle = `rgba(255, 0, 68, ${0.1 + (Math.sin(Date.now() * 0.05) * 0.05 + 0.1) * (1 - this.chargeTimer/this.chargeDuration)})`;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
@@ -652,20 +688,25 @@ export class Striker extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Sleek dual-spiked racer
+    // Twin-spiked hyper cyan racer
     ctx.beginPath();
-    ctx.moveTo(18, 0);
-    ctx.lineTo(4, -12);
-    ctx.lineTo(-12, -8);
-    ctx.lineTo(-8, 0);
-    ctx.lineTo(-12, 8);
-    ctx.lineTo(4, 12);
+    ctx.moveTo(22, 0);        // Spiked nose cone
+    ctx.lineTo(6, -14);       // Right side spike tip
+    ctx.lineTo(-4, -8);       // Inset body
+    ctx.lineTo(-16, -14);     // Rear right wing
+    ctx.lineTo(-12, 0);       // Central thruster
+    ctx.lineTo(-16, 14);      // Rear left wing
+    ctx.lineTo(-4, 8);        // Inset body
+    ctx.lineTo(6, 14);        // Left side spike tip
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
 
-    // Spoiler
-    ctx.fillRect(-16, -10, 4, 20);
+    // Cyan Thruster Flame
+    if (this.isDashing) {
+      ctx.fillStyle = 'var(--neon-cyan)';
+      ctx.fillRect(-22, -4, 10, 8);
+    }
   }
 }
 
@@ -725,23 +766,31 @@ export class Drone extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Quadcopter circular rotor chassis
+    // High-tech quadcopter with spinning rotor blades
     ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI*2);
+    ctx.arc(0, 0, 11, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Rotors lines
+    // Central Green Sensor Eye
+    ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.moveTo(-14, -14); ctx.lineTo(14, 14);
-    ctx.moveTo(14, -14); ctx.lineTo(-14, 14);
-    ctx.stroke();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Rotor circular blades
+    // Rotor Struts and Blades
     const offsets = [ {x:-14, y:-14}, {x:14, y:-14}, {x:14, y:14}, {x:-14, y:14} ];
+    ctx.strokeStyle = 'var(--neon-green)';
+    ctx.lineWidth = 1.5;
+    
     offsets.forEach(o => {
       ctx.beginPath();
-      ctx.arc(o.x, o.y, 4, 0, Math.PI*2);
+      ctx.moveTo(0, 0);
+      ctx.lineTo(o.x, o.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, 5, 0, Math.PI * 2);
       ctx.stroke();
     });
   }
@@ -828,19 +877,25 @@ export class Kamikaze extends Enemy {
   }
 
   drawChassis(ctx) {
-    // Spiky spherical mine shape
+    // Pulsing spiky overloaded mine runner
     ctx.beginPath();
-    ctx.arc(0, 0, 11, 0, Math.PI*2);
+    ctx.arc(0, 0, 12, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Mine spikes
+    // Spiky mine needles extending outward
     ctx.beginPath();
     for (let i = 0; i < 8; i++) {
-      const angle = (i * Math.PI * 2) / 8;
-      ctx.moveTo(Math.cos(angle)*11, Math.sin(angle)*11);
-      ctx.lineTo(Math.cos(angle)*16, Math.sin(angle)*16);
+      const angle = (i * Math.PI * 2) / 8 + (Date.now() * 0.006);
+      ctx.moveTo(Math.cos(angle) * 12, Math.sin(angle) * 12);
+      ctx.lineTo(Math.cos(angle) * 18, Math.sin(angle) * 18);
     }
     ctx.stroke();
+
+    // Core overload eye
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.fill();
   }
 }

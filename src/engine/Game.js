@@ -954,68 +954,76 @@ export class Game {
   renderTouchControls() {
     this.ctx.save();
     
-    // Left side: Movement Joystick
-    if (this.input.joystick.active) {
-      const j = this.input.joystick;
-      
-      // Outer base
-      this.ctx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
-      this.ctx.lineWidth = 3;
-      this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 10 : 0;
-      this.ctx.shadowColor = 'var(--neon-cyan)';
-      
-      this.ctx.beginPath();
-      this.ctx.arc(j.startX, j.startY, 50, 0, Math.PI*2);
-      this.ctx.stroke();
-      
-      // Inner handle
-      this.ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
-      this.ctx.beginPath();
-      this.ctx.arc(j.curX, j.curY, 20, 0, Math.PI*2);
-      this.ctx.fill();
-    }
-
-    // Right side: Boost & Fire Buttons
-    const rect = this.canvas.getBoundingClientRect();
-    const bx = rect.width - 90;
-    const by = rect.height - 90;
+    // Left side: Movement Joystick Base & Knob
+    const j = this.input.joystick;
+    const baseR = 50;
+    const handleR = 22;
     
-    // Firing Touch Area Indicator
-    this.ctx.strokeStyle = this.input.shootBtn.active ? 'var(--neon-green)' : 'rgba(57, 255, 20, 0.3)';
-    this.ctx.fillStyle = this.input.shootBtn.active ? 'rgba(57, 255, 20, 0.2)' : 'rgba(0, 0, 0, 0.4)';
-    this.ctx.lineWidth = 3;
-    this.ctx.shadowColor = 'var(--neon-green)';
-    this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 8 : 0;
+    // Render static hint ring if joystick inactive
+    const jx = j.active ? j.startX : 90;
+    const jy = j.active ? j.startY : this.canvas.height - 90;
+    const curX = j.active ? j.curX : jx;
+    const curY = j.active ? j.curY : jy;
+
+    // Outer base ring
+    this.ctx.strokeStyle = j.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.35)';
+    this.ctx.fillStyle = j.active ? 'rgba(0, 243, 255, 0.12)' : 'rgba(4, 6, 18, 0.4)';
+    this.ctx.lineWidth = 2.5;
+    this.ctx.shadowColor = 'var(--neon-cyan)';
+    this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && j.active) ? 12 : 0;
     
     this.ctx.beginPath();
-    this.ctx.arc(bx, by, 35, 0, Math.PI*2);
+    this.ctx.arc(jx, jy, baseR, 0, Math.PI * 2);
     this.ctx.fill();
     this.ctx.stroke();
     
-    this.ctx.fillStyle = '#fff';
-    this.ctx.font = 'bold 11px Orbitron';
+    // Inner handle knob
+    this.ctx.fillStyle = j.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.5)';
+    this.ctx.beginPath();
+    this.ctx.arc(curX, curY, handleR, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Right side: Action Touch Buttons
+    const rect = this.canvas.getBoundingClientRect();
+    const bx = rect.width - 85;
+    const by = rect.height - 85;
+    
+    // 1. FIRE Touch Button (💥)
+    this.ctx.strokeStyle = this.input.shootBtn.active ? 'var(--neon-green)' : 'rgba(0, 255, 136, 0.4)';
+    this.ctx.fillStyle = this.input.shootBtn.active ? 'rgba(0, 255, 136, 0.3)' : 'rgba(4, 6, 18, 0.5)';
+    this.ctx.lineWidth = 3;
+    this.ctx.shadowColor = 'var(--neon-green)';
+    this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.shootBtn.active) ? 14 : 0;
+    
+    this.ctx.beginPath();
+    this.ctx.arc(bx, by, 36, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.stroke();
+    
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = 'bold 12px Orbitron';
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.shadowBlur = 0;
-    this.ctx.fillText("FIRE", bx, by);
+    this.ctx.fillText("💥 FIRE", bx, by);
 
-    // Boost Touch Area Indicator
-    const tbx = rect.width - 90;
-    const tby = rect.height - 180;
+    // 2. BOOST Touch Button (🚀)
+    const tbx = rect.width - 85;
+    const tby = rect.height - 175;
     
-    this.ctx.strokeStyle = this.input.boostBtn.active ? 'var(--neon-yellow)' : 'rgba(255, 234, 0, 0.3)';
-    this.ctx.fillStyle = this.input.boostBtn.active ? 'rgba(255, 234, 0, 0.2)' : 'rgba(0, 0, 0, 0.4)';
+    this.ctx.strokeStyle = this.input.boostBtn.active ? 'var(--neon-yellow)' : 'rgba(255, 204, 0, 0.4)';
+    this.ctx.fillStyle = this.input.boostBtn.active ? 'rgba(255, 204, 0, 0.3)' : 'rgba(4, 6, 18, 0.5)';
     this.ctx.lineWidth = 3;
     this.ctx.shadowColor = 'var(--neon-yellow)';
-    this.ctx.shadowBlur = this.saveData.settings.glowEnabled ? 8 : 0;
+    this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.boostBtn.active) ? 14 : 0;
     
     this.ctx.beginPath();
-    this.ctx.arc(tbx, tby, 28, 0, Math.PI*2);
+    this.ctx.arc(tbx, tby, 30, 0, Math.PI * 2);
     this.ctx.fill();
     this.ctx.stroke();
     
-    this.ctx.fillStyle = '#fff';
-    this.ctx.fillText("BOOST", tbx, tby);
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillText("🚀 BOOST", tbx, tby);
     
     this.ctx.restore();
   }

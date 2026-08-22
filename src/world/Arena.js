@@ -287,39 +287,41 @@ export class Arena {
 
     ctx.save();
 
-    // 1. Draw Player Center Radial Glow Spotlight (Illuminates player area in bright Electric Cyan & Gold)
+    // 1. Draw Player Spotlight Glow (Illuminates player area in Cyan & Magenta)
     const playerX = (this.game && this.game.player) ? this.game.player.x : camera.x + camera.width / 2;
     const playerY = (this.game && this.game.player) ? this.game.player.y : camera.y + camera.height / 2;
     const playerScreenX = (playerX - camera.x) * camera.zoom;
     const playerScreenY = (playerY - camera.y) * camera.zoom;
     
-    const grad = ctx.createRadialGradient(playerScreenX, playerScreenY, 20, playerScreenX, playerScreenY, 650);
-    grad.addColorStop(0, 'rgba(0, 240, 255, 0.18)');
-    grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.08)');
-    grad.addColorStop(1, 'rgba(6, 8, 20, 0)');
+    const grad = ctx.createRadialGradient(playerScreenX, playerScreenY, 20, playerScreenX, playerScreenY, 750);
+    grad.addColorStop(0, 'rgba(0, 243, 255, 0.22)');
+    grad.addColorStop(0.4, 'rgba(157, 0, 255, 0.12)');
+    grad.addColorStop(1, 'rgba(4, 6, 18, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, camera.width, camera.height);
 
-    // 2. Render parallax background skyscrapers in the distance!
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.22)'; // bright cyan skyline
+    // 2. Render Parallax Cyber City Skyscrapers in the distance
+    ctx.strokeStyle = 'rgba(0, 243, 255, 0.28)';
     ctx.lineWidth = 2;
-    for (let i = 0; i < 8; i++) {
-      const bx = ((i * 450 - camera.x * 0.15) % (camera.width + 400)) - 200;
-      const bHeight = 140 + (i % 3) * 120;
-      const bWidth = 95 + (i % 2) * 60;
+    for (let i = 0; i < 10; i++) {
+      const bx = ((i * 380 - camera.x * 0.12) % (camera.width + 400)) - 200;
+      const bHeight = 160 + (i % 4) * 110;
+      const bWidth = 90 + (i % 3) * 45;
+      
+      // Building silhouette box
       ctx.strokeRect(bx, camera.height - bHeight, bWidth, bHeight);
       
-      // Window grid rows inside skyscrapers
-      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 240, 255, 0.09)' : 'rgba(255, 234, 0, 0.08)';
-      ctx.fillRect(bx + 10, camera.height - bHeight + 10, bWidth - 20, bHeight - 20);
+      // Illuminated window grid rows
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 243, 255, 0.12)' : 'rgba(255, 0, 127, 0.10)';
+      ctx.fillRect(bx + 8, camera.height - bHeight + 8, bWidth - 16, bHeight - 16);
     }
 
-    // 3. High-Contrast Vibrant Grid Lines
+    // 3. High-Contrast Cyber Grid Lines
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.32)'; // VIBRANT GRID LINES
+    ctx.strokeStyle = 'rgba(0, 243, 255, 0.35)';
     const glowEnabled = this.game?.saveData?.settings?.glowEnabled ?? true;
-    ctx.shadowBlur = glowEnabled ? 6 : 0;
-    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = glowEnabled ? 8 : 0;
+    ctx.shadowColor = '#00f3ff';
 
     ctx.beginPath();
     // Vertical grid lines
@@ -339,32 +341,33 @@ export class Arena {
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // 4. Glowing intersection crosses
-    ctx.fillStyle = '#00f0ff';
+    // 4. Glowing Intersection Crosses
+    ctx.fillStyle = '#00f3ff';
     for (let x = startX; x <= endX; x += gridSpacing) {
       if (x < 0 || x > this.width) continue;
       for (let y = startY; y <= endY; y += gridSpacing) {
         if (y < 0 || y > this.height) continue;
         const screenX = (x - camera.x) * camera.zoom;
         const screenY = (y - camera.y) * camera.zoom;
-        ctx.fillRect(screenX - 5, screenY - 1, 10, 2);
-        ctx.fillRect(screenX - 1, screenY - 5, 2, 10);
+        ctx.fillRect(screenX - 6, screenY - 1, 12, 2);
+        ctx.fillRect(screenX - 1, screenY - 6, 2, 12);
       }
     }
 
-    // 5. Parallax Star/Dust particles (bright cyber particles)
-    for (let i = 0; i < 50; i++) {
-      const sx = ((i * 12345) % camera.width);
-      const sy = ((i * 54321) % camera.height);
-      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 240, 255, 0.6)' : 'rgba(255, 0, 180, 0.6)';
-      ctx.fillRect(sx, sy, 2, 2);
+    // 5. Digital Rain Particles & Cyber Dust
+    const time = Date.now() * 0.002;
+    for (let i = 0; i < 45; i++) {
+      const sx = ((i * 137 + time * 40) % camera.width);
+      const sy = ((i * 269 + time * 80) % camera.height);
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 243, 255, 0.65)' : 'rgba(255, 0, 127, 0.65)';
+      ctx.fillRect(sx, sy, 2.5, 2.5);
     }
 
     ctx.restore();
   }
 
   renderStationsAndObstacles(ctx) {
-    // 1. Render Stations (Neon landing fields)
+    // 1. Render Stations (Neon Landing Fields)
     this.stations.forEach(st => {
       ctx.save();
       const isHealth = st.type === 'health';
@@ -374,18 +377,18 @@ export class Arena {
       ctx.strokeStyle = color;
       ctx.lineWidth = 3;
       
-      // Floating glowing neon outer box
-      ctx.shadowBlur = 10 + Math.sin(st.pulse) * 6;
+      const glowEnabled = this.game?.saveData?.settings?.glowEnabled ?? true;
+      ctx.shadowBlur = glowEnabled ? (12 + Math.sin(st.pulse) * 6) : 0;
       ctx.shadowColor = color;
       ctx.strokeRect(st.x, st.y, st.width, st.height);
 
-      // Inner details
-      ctx.fillStyle = isHealth ? 'rgba(57, 255, 20, 0.04)' : 'rgba(255, 234, 0, 0.04)';
+      // Inner field glow
+      ctx.fillStyle = isHealth ? 'rgba(0, 255, 136, 0.08)' : 'rgba(255, 204, 0, 0.08)';
       ctx.fillRect(st.x, st.y, st.width, st.height);
       
-      // Charging bolt / Cross logo in middle
+      // Icon in middle
       ctx.fillStyle = color;
-      ctx.font = '700 24px Orbitron';
+      ctx.font = '700 32px Orbitron';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(isHealth ? '✚' : '⚡', st.x + st.width/2, st.y + st.height/2);
@@ -393,20 +396,20 @@ export class Arena {
       ctx.restore();
     });
 
-    // 2. Render solid obstacles
+    // 2. Render Solid Obstacles
     this.obstacles.forEach(o => {
       ctx.save();
       
       if (o.type === 'concrete') {
-        // High walls (Bright Electric Cyan)
-        ctx.fillStyle = 'rgba(0, 180, 255, 0.35)';
-        ctx.strokeStyle = '#00f0ff';
+        // High Walls (Bright Electric Cyan)
+        ctx.fillStyle = 'rgba(0, 180, 255, 0.38)';
+        ctx.strokeStyle = '#00f3ff';
         ctx.lineWidth = 3;
         ctx.fillRect(o.x, o.y, o.width, o.height);
         ctx.strokeRect(o.x, o.y, o.width, o.height);
         
-        // Cross diagonal lines inside for wireframe texture
-        ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+        // Inner wireframe diagonal cross
+        ctx.strokeStyle = 'rgba(0, 243, 255, 0.45)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(o.x, o.y);
@@ -415,50 +418,46 @@ export class Arena {
         ctx.lineTo(o.x, o.y + o.height);
         ctx.stroke();
       } else if (o.type === 'crate') {
-        // Cargo container (Bright Glowing Amber Gold + Hazard Borders)
-        ctx.fillStyle = 'rgba(255, 170, 0, 0.45)';
+        // Cargo Container (Amber Gold + Hazard Borders)
+        ctx.fillStyle = 'rgba(255, 170, 0, 0.50)';
         ctx.strokeStyle = '#ffaa00';
         ctx.lineWidth = 3;
         ctx.fillRect(o.x, o.y, o.width, o.height);
         ctx.strokeRect(o.x, o.y, o.width, o.height);
 
-        // Draw inner box
+        // Inner box border
         ctx.strokeRect(o.x + 5, o.y + 5, o.width - 10, o.height - 10);
         
-        // Show HP bar above crate if damaged
+        // Damaged HP Bar
         if (o.health < o.maxHealth) {
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
           ctx.fillRect(o.x, o.y - 8, o.width, 4);
-          ctx.fillStyle = '#39ff14';
+          ctx.fillStyle = '#00ff88';
           ctx.fillRect(o.x, o.y - 8, o.width * (o.health / o.maxHealth), 4);
         }
       } else if (o.type === 'barrel') {
-        // Fuel barrel (Bright Neon Red cylinders)
-        ctx.fillStyle = 'rgba(255, 0, 60, 0.55)';
+        // Explosive Fuel Barrel (Bright Neon Red)
+        ctx.fillStyle = 'rgba(255, 0, 68, 0.65)';
         const colorRed = resolveColor('var(--neon-red)');
         ctx.strokeStyle = colorRed;
         ctx.lineWidth = 3;
         
-        // Draw cylinder
         ctx.beginPath();
         ctx.arc(o.x + o.width/2, o.y + o.height/2, o.width/2, 0, Math.PI*2);
         ctx.fill();
         ctx.stroke();
         
-        // Draw warning hazard symbol in middle
+        // Hazard Warning Eye
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(o.x + o.width/2, o.y + o.height/2, 4, 0, Math.PI*2);
-        ctx.fill();
         ctx.beginPath();
         ctx.arc(o.x + o.width/2, o.y + o.height/2, 4, 0, Math.PI*2);
         ctx.fill();
 
         if (o.health < o.maxHealth) {
-          ctx.fillStyle = 'rgba(255, 0, 60, 0.4)';
-          ctx.fillRect(o.x, o.y - 8, o.width, 3);
-          ctx.fillStyle = 'rgba(57, 255, 20, 0.8)';
-          ctx.fillRect(o.x, o.y - 8, o.width * (o.health / o.maxHealth), 3);
+          ctx.fillStyle = 'rgba(255, 0, 68, 0.4)';
+          ctx.fillRect(o.x, o.y - 8, o.width, 4);
+          ctx.fillStyle = '#00ff88';
+          ctx.fillRect(o.x, o.y - 8, o.width * (o.health / o.maxHealth), 4);
         }
       }
 

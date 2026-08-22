@@ -1,15 +1,17 @@
 export const Colors = {
-  cyan: '#00f0ff',
-  magenta: '#00e5ff',
-  yellow: '#ffea00',
-  purple: '#0099ff',
-  green: '#39ff14',
-  red: '#ff003c',
-  blue: '#00a2ff',
-  orange: '#ff7700',
+  cyan: '#00f3ff',
+  magenta: '#ff007f',
+  yellow: '#ffcc00',
+  purple: '#9d00ff',
+  green: '#00ff88',
+  red: '#ff0044',
+  blue: '#0066ff',
+  orange: '#ff5500',
+  gold: '#ffcc00',
+  pink: '#ff007f',
   white: '#ffffff',
-  grey: '#a0a0c0',
-  dark: '#080c1c'
+  grey: '#8a99ad',
+  dark: '#040612'
 };
 
 export function resolveColor(color) {

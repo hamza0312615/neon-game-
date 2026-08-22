@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NEON CIRCUIT — Advanced Top-Down Car Shooter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>NEON CIRCUIT — Advanced Top-Down Combat</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,20 +20,20 @@
         <!-- MAIN MENU -->
         <div id="menu-main" class="ui-screen active">
           <div class="neon-title-container">
-            <h1 class="neon-title" data-text="NEON CIRCUIT">NEON CIRCUIT</h1>
-            <p class="neon-subtitle">ADVANCED TOP-DOWN CAR COMBAT</p>
+            <h1 class="neon-title" data-text="NEON CIRCUIT">⚡ NEON CIRCUIT</h1>
+            <p class="neon-subtitle">🏎️ HIGH-OCTANE CYBER COMBAT 💥</p>
           </div>
           <div class="menu-car-preview">
             <div class="car-wireframe"></div>
           </div>
           <div class="menu-buttons">
-            <button id="btn-play" class="neon-btn btn-primary"><span>START COMBAT</span></button>
-            <button id="btn-garage" class="neon-btn"><span>GARAGE / UPGRADES</span></button>
-            <button id="btn-tutorial" class="neon-btn"><span>HOW TO PLAY</span></button>
-            <button id="btn-settings" class="neon-btn"><span>SETTINGS</span></button>
+            <button id="btn-play" class="neon-btn btn-primary"><span>🎮 START COMBAT</span></button>
+            <button id="btn-garage" class="neon-btn"><span>🏎️ GARAGE & UPGRADES</span></button>
+            <button id="btn-tutorial" class="neon-btn"><span>📖 HOW TO PLAY</span></button>
+            <button id="btn-settings" class="neon-btn"><span>⚙️ SETTINGS</span></button>
           </div>
           <div class="menu-footer">
-            <span id="best-score-display">HIGH SCORE: 0</span> | <span id="total-credits-display">CREDITS: 0</span>
+            <span id="best-score-display">🏆 HIGH SCORE: 0</span> | <span id="total-credits-display">🪙 CREDITS: 0</span>
           </div>
         </div>
 
@@ -52,7 +52,7 @@
               <span id="hud-shield-text">50 / 50</span>
             </div>
             <div class="hud-bar-container armor">
-              <label>🛡️ ARMOR</label>
+              <label>⚙️ ARMOR</label>
               <div class="bar-outer"><div id="hud-armor-bar" class="bar-inner armor" style="width: 100%"></div></div>
               <span id="hud-armor-text">15% ABS</span>
             </div>
@@ -99,8 +99,8 @@
 
           <!-- Center Messages -->
           <div id="hud-alert-overlay">
-            <h1 id="hud-big-alert" class="hidden">WAVE START</h1>
-            <p id="hud-sub-alert" class="hidden">PREPARE FOR BATTLE</p>
+            <h1 id="hud-big-alert" class="hidden">🌊 WAVE START</h1>
+            <p id="hud-sub-alert" class="hidden">🎯 PREPARE FOR BATTLE</p>
           </div>
 
           <!-- Active Powerup Indicators -->
@@ -110,204 +110,204 @@
 
           <!-- Combo Multiplier -->
           <div id="hud-combo-container" class="hidden">
-            <div id="hud-combo-value">COMBO ×1</div>
+            <div id="hud-combo-value">⚡ COMBO ×1</div>
             <div class="combo-bar-outer"><div id="hud-combo-bar" class="combo-bar-inner"></div></div>
           </div>
         </div>
 
         <!-- GARAGE / UPGRADES -->
         <div id="menu-garage" class="ui-screen hidden">
-          <h2 class="section-title">GARAGE & UPGRADES</h2>
+          <h2 class="section-title">🏎️ GARAGE & UPGRADES</h2>
           <div class="garage-container">
             <div class="garage-left">
-              <div class="credits-badge">AVAILABLE CREDITS: <span id="garage-credits">0</span></div>
+              <div class="credits-badge">🪙 AVAILABLE CREDITS: <span id="garage-credits">0</span></div>
               
               <!-- Upgrade Tabs/Categories -->
               <div class="upgrades-list-container">
                 <div class="upgrade-item" data-category="engine">
                   <div class="upgrade-info">
-                    <h3>ENGINE (Speed & Acceleration)</h3>
+                    <h3>🏎️ ENGINE (Speed & Accel)</h3>
                     <p>Current: <span id="upgrade-lvl-engine">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-engine"><span>UPGRADE (<span class="cost">100</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-engine"><span>UPGRADE (<span class="cost">100</span> 🪙)</span></button>
                 </div>
                 
                 <div class="upgrade-item" data-category="armor">
                   <div class="upgrade-info">
-                    <h3>ARMOR (HP & Damage Resist)</h3>
+                    <h3>⚙️ ARMOR (Hull & Defense)</h3>
                     <p>Current: <span id="upgrade-lvl-armor">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-armor"><span>UPGRADE (<span class="cost">100</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-armor"><span>UPGRADE (<span class="cost">100</span> 🪙)</span></button>
                 </div>
 
                 <div class="upgrade-item" data-category="shield">
                   <div class="upgrade-info">
-                    <h3>SHIELD (Max capacity & Recharge)</h3>
+                    <h3>🛡️ SHIELD (Capacity & Recharge)</h3>
                     <p>Current: <span id="upgrade-lvl-shield">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-shield"><span>UPGRADE (<span class="cost">100</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-shield"><span>UPGRADE (<span class="cost">100</span> 🪙)</span></button>
                 </div>
 
                 <div class="upgrade-item" data-category="weapon">
                   <div class="upgrade-info">
-                    <h3>WEAPONS SYSTEM (Damage & Cooldown)</h3>
+                    <h3>💥 WEAPONS (Damage & Rate)</h3>
                     <p>Current: <span id="upgrade-lvl-weapon">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-weapon"><span>UPGRADE (<span class="cost">120</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-weapon"><span>UPGRADE (<span class="cost">120</span> 🪙)</span></button>
                 </div>
 
                 <div class="upgrade-item" data-category="handling">
                   <div class="upgrade-info">
-                    <h3>HANDLING (Turn rate & Drift control)</h3>
+                    <h3>🔄 HANDLING (Steering & Drift)</h3>
                     <p>Current: <span id="upgrade-lvl-handling">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-handling"><span>UPGRADE (<span class="cost">80</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-handling"><span>UPGRADE (<span class="cost">80</span> 🪙)</span></button>
                 </div>
 
                 <div class="upgrade-item" data-category="boost">
                   <div class="upgrade-info">
-                    <h3>BOOST CHARGER (Capacity & Recharge)</h3>
+                    <h3>🚀 BOOST (Energy & Recharge)</h3>
                     <p>Current: <span id="upgrade-lvl-boost">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-boost"><span>UPGRADE (<span class="cost">90</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-boost"><span>UPGRADE (<span class="cost">90</span> 🪙)</span></button>
                 </div>
 
                 <div class="upgrade-item" data-category="utility">
                   <div class="upgrade-info">
-                    <h3>UTILITY (Magnet range & XP boost)</h3>
+                    <h3>🧲 UTILITY (Magnet & XP Boost)</h3>
                     <p>Current: <span id="upgrade-lvl-utility">Lvl 1</span></p>
                   </div>
-                  <button class="neon-btn btn-upgrade" id="btn-upgrade-utility"><span>UPGRADE (<span class="cost">80</span> CR)</span></button>
+                  <button class="neon-btn btn-upgrade" id="btn-upgrade-utility"><span>UPGRADE (<span class="cost">80</span> 🪙)</span></button>
                 </div>
               </div>
             </div>
 
             <div class="garage-right">
-              <h3>WEAPON SELECTOR</h3>
-              <p>Unlocks based on your highest wave record or credits.</p>
+              <h3>⚔️ WEAPON SELECTOR</h3>
+              <p>Unlocks based on your highest wave record.</p>
               <div class="weapons-grid">
                 <div class="weapon-card active" data-weapon="plasma">
-                  <h4>PLASMA CANNON</h4>
-                  <p>Standard issue firing rate.</p>
+                  <h4>⚡ PLASMA CANNON</h4>
+                  <p>Standard issue rapid pulse fire.</p>
                   <span class="status">EQUIPPED</span>
                 </div>
                 <div class="weapon-card locked" data-weapon="spread" data-unlock="3">
-                  <h4>SPREAD BLASTER</h4>
-                  <p>Fires 3 spread projectiles.</p>
-                  <span class="status">UNLOCKS AT WAVE 3</span>
+                  <h4>💥 SPREAD BLASTER</h4>
+                  <p>Fires 3 spread heavy projectiles.</p>
+                  <span class="status">WAVE 3</span>
                 </div>
                 <div class="weapon-card locked" data-weapon="railgun" data-unlock="7">
-                  <h4>HYPER RAILGUN</h4>
-                  <p>Slow charge piercing projectile.</p>
-                  <span class="status">UNLOCKS AT WAVE 7</span>
+                  <h4>🎯 HYPER RAILGUN</h4>
+                  <p>Piercing high-damage beam sniper.</p>
+                  <span class="status">WAVE 7</span>
                 </div>
                 <div class="weapon-card locked" data-weapon="missile" data-unlock="12">
-                  <h4>SEEKER MISSILES</h4>
-                  <p>Self-guided target lock seekers.</p>
-                  <span class="status">UNLOCKS AT WAVE 12</span>
+                  <h4>🚀 SEEKER MISSILES</h4>
+                  <p>Self-guided target lock rockets.</p>
+                  <span class="status">WAVE 12</span>
                 </div>
                 <div class="weapon-card locked" data-weapon="laser" data-unlock="16">
-                  <h4>THERMAL LASER</h4>
+                  <h4>🔦 THERMAL LASER</h4>
                   <p>Continuous beam with heat control.</p>
-                  <span class="status">UNLOCKS AT WAVE 16</span>
+                  <span class="status">WAVE 16</span>
                 </div>
                 <div class="weapon-card locked" data-weapon="emp" data-unlock="20">
-                  <h4>EMP CRUSHER</h4>
+                  <h4>⚡ EMP CRUSHER</h4>
                   <p>Releases electrical disabling rings.</p>
-                  <span class="status">UNLOCKS AT WAVE 20</span>
+                  <span class="status">WAVE 20</span>
                 </div>
               </div>
             </div>
           </div>
           <div class="garage-footer">
-            <button id="btn-garage-back" class="neon-btn"><span>BACK TO MENU</span></button>
+            <button id="btn-garage-back" class="neon-btn"><span>◀️ BACK TO MENU</span></button>
           </div>
         </div>
 
         <!-- PAUSE MENU -->
         <div id="menu-pause" class="ui-screen hidden">
-          <h2 class="neon-text-pulse">SYSTEM PAUSED</h2>
+          <h2 class="neon-text-pulse">⏸️ SYSTEM PAUSED</h2>
           <div class="menu-buttons">
-            <button id="btn-resume" class="neon-btn btn-primary"><span>RESUME SIMULATION</span></button>
-            <button id="btn-pause-settings" class="neon-btn"><span>SETTINGS</span></button>
-            <button id="btn-restart" class="neon-btn"><span>RESTART COMBAT</span></button>
-            <button id="btn-abort" class="neon-btn"><span>ABORT / MAIN MENU</span></button>
+            <button id="btn-resume" class="neon-btn btn-primary"><span>▶️ RESUME</span></button>
+            <button id="btn-pause-settings" class="neon-btn"><span>⚙️ SETTINGS</span></button>
+            <button id="btn-restart" class="neon-btn"><span>🔄 RESTART COMBAT</span></button>
+            <button id="btn-abort" class="neon-btn"><span>🏠 MAIN MENU</span></button>
           </div>
         </div>
 
         <!-- SETTINGS -->
         <div id="menu-settings" class="ui-screen hidden">
-          <h2 class="section-title">SYSTEM SETTINGS</h2>
+          <h2 class="section-title">⚙️ SYSTEM SETTINGS</h2>
           <div class="settings-form">
             <div class="setting-row">
-              <label>MASTER VOLUME</label>
+              <label>🔊 MASTER VOLUME</label>
               <input type="range" id="vol-master" min="0" max="100" value="70">
             </div>
             <div class="setting-row">
-              <label>MUSIC VOLUME</label>
+              <label>🎵 MUSIC VOLUME</label>
               <input type="range" id="vol-music" min="0" max="100" value="50">
             </div>
             <div class="setting-row">
-              <label>SFX VOLUME</label>
+              <label>💥 SFX VOLUME</label>
               <input type="range" id="vol-sfx" min="0" max="100" value="80">
             </div>
             <div class="setting-row">
-              <label>GLOW EFFECTS (BLOOM)</label>
+              <label>✨ GLOW EFFECTS (BLOOM)</label>
               <input type="checkbox" id="setting-glow" checked>
             </div>
             <div class="setting-row">
-              <label>PARTICLE DENSITY</label>
+              <label>🌟 PARTICLE DENSITY</label>
               <select id="setting-particles">
                 <option value="high">HIGH (Vibrant)</option>
                 <option value="medium">MEDIUM (Optimized)</option>
-                <option value="low">LOW (Maximum FPS)</option>
+                <option value="low">LOW (Max FPS)</option>
               </select>
             </div>
             <div class="setting-row">
-              <label>CAMERA SHAKE</label>
+              <label>📳 CAMERA SHAKE</label>
               <input type="checkbox" id="setting-shake" checked>
             </div>
             <div class="setting-row">
-              <label>DAMAGE NUMBERS</label>
+              <label>🔢 DAMAGE NUMBERS</label>
               <input type="checkbox" id="setting-damage-nums" checked>
             </div>
           </div>
-          <button id="btn-settings-back" class="neon-btn"><span>SAVE & RETURN</span></button>
+          <button id="btn-settings-back" class="neon-btn"><span>💾 SAVE & RETURN</span></button>
         </div>
 
         <!-- TUTORIAL / HOW TO PLAY -->
         <div id="menu-tutorial" class="ui-screen hidden">
-          <h2 class="section-title">TACTICAL DATAFEED</h2>
+          <h2 class="section-title">📖 TACTICAL DATAFEED</h2>
           <div class="tutorial-content">
             <div class="tutorial-grid">
               <div class="tut-section">
-                <h3>DRIVING CONTROLS</h3>
-                <p><strong>W / A / S / D</strong> or <strong>ARROWS</strong> to control the chassis.</p>
-                <p>Accelerate, decelerate, and use momentum to slide corners. Steer hard at high speeds to initiate a <strong>DRIFT</strong>.</p>
+                <h3>🏎️ DRIVING CONTROLS</h3>
+                <p><strong>W / A / S / D</strong> or <strong>ARROWS</strong> to steer chassis.</p>
+                <p>Accelerate, decelerate, and drift hard around corners to build energy.</p>
               </div>
               <div class="tut-section">
-                <h3>TARGETING SYSTEM</h3>
-                <p>Use your <strong>MOUSE</strong> to aim the independent weapon turret.</p>
-                <p>Hold <strong>LEFT CLICK</strong> or <strong>SPACEBAR</strong> to unleash fire. Drifting recharges boost energy.</p>
+                <h3>🎯 TARGETING SYSTEM</h3>
+                <p>Use <strong>MOUSE</strong> or <strong>TOUCH</strong> to aim turret.</p>
+                <p>Hold <strong>LEFT CLICK</strong> or <strong>SPACE</strong> to unleash fire.</p>
               </div>
               <div class="tut-section">
-                <h3>TURBO BOOST</h3>
-                <p>Press <strong>LEFT SHIFT</strong> to fire the boosters.</p>
-                <p>Dashes you forward, increases maximum speed, and lets you slam out of tight corners.</p>
+                <h3>🚀 TURBO BOOST</h3>
+                <p>Press <strong>LEFT SHIFT</strong> or touch <strong>BOOST</strong>.</p>
+                <p>Dashes forward, increases max speed, and breaks out of tight spots.</p>
               </div>
               <div class="tut-section">
-                <h3>PERK PROTOCOL</h3>
-                <p>Destroy enemies to siphon their **XP cells**. Collecting enough triggers a Level Up, letting you select temporary stat updates mid-fight!</p>
+                <h3>🌟 PERK PROTOCOL</h3>
+                <p>Collect <strong>XP cells</strong> to Level Up and select powerful combat perks mid-game!</p>
               </div>
             </div>
           </div>
-          <button id="btn-tutorial-back" class="neon-btn"><span>DISMISS SYSTEM</span></button>
+          <button id="btn-tutorial-back" class="neon-btn"><span>◀️ DISMISS</span></button>
         </div>
 
         <!-- INTERACTIVE IN-GAME TUTORIAL OVERLAY -->
         <div id="tutorial-overlay" class="hidden">
           <div id="tut-popup">
-            <h3>TUTORIAL SYSTEM INITIALIZED</h3>
+            <h3>⚡ TUTORIAL SYSTEM</h3>
             <p id="tut-instruction">Drive using W, A, S, D keys.</p>
             <div class="tut-progress-dots">
               <span class="dot active"></span>
@@ -315,13 +315,13 @@
               <span class="dot"></span>
               <span class="dot"></span>
             </div>
-            <button id="btn-skip-tut" class="neon-btn btn-small"><span>SKIP TUTORIAL</span></button>
+            <button id="btn-skip-tut" class="neon-btn btn-small"><span>⏩ SKIP TUTORIAL</span></button>
           </div>
         </div>
 
         <!-- LEVEL UP SELECTOR -->
         <div id="menu-level-up" class="ui-screen hidden">
-          <h2 class="neon-text-pulse">LEVEL UP REGISTERED</h2>
+          <h2 class="neon-text-pulse">🌟 LEVEL UP!</h2>
           <p>SELECT AN UPGRADE COMPONENT:</p>
           <div id="level-up-choices" class="choices-container">
             <!-- Dynamically populated cards -->
@@ -330,37 +330,37 @@
 
         <!-- GAME OVER -->
         <div id="menu-game-over" class="ui-screen hidden">
-          <h1 class="glitch-title">CHASSIS DESTROYED</h1>
+          <h1 class="glitch-title">💀 CHASSIS DESTROYED</h1>
           <h3 class="neon-text-fail">COMBAT INEFFECTIVE</h3>
           <div class="stats-panel">
-            <div class="stat-row"><span>WAVES COMPLETED</span><span id="stat-waves" class="val">0</span></div>
-            <div class="stat-row"><span>SCORE ACHIEVED</span><span id="stat-score" class="val">0</span></div>
-            <div class="stat-row"><span>HOSTILES ELIMINATED</span><span id="stat-kills" class="val">0</span></div>
-            <div class="stat-row"><span>ELITE UNITS DEFEATED</span><span id="stat-elites" class="val">0</span></div>
-            <div class="stat-row"><span>CREDITS SALVAGED</span><span id="stat-credits-earned" class="val">0</span></div>
-            <div class="stat-row"><span>BEST COMBO MULTIPLIER</span><span id="stat-combo" class="val">×1</span></div>
-            <div class="stat-row"><span>SURVIVAL ELAPSED TIME</span><span id="stat-time" class="val">0:00</span></div>
+            <div class="stat-row"><span>🌊 WAVES COMPLETED</span><span id="stat-waves" class="val">0</span></div>
+            <div class="stat-row"><span>🏆 SCORE ACHIEVED</span><span id="stat-score" class="val">0</span></div>
+            <div class="stat-row"><span>👾 HOSTILES ELIMINATED</span><span id="stat-kills" class="val">0</span></div>
+            <div class="stat-row"><span>💥 ELITE UNITS DEFEATED</span><span id="stat-elites" class="val">0</span></div>
+            <div class="stat-row"><span>🪙 CREDITS SALVAGED</span><span id="stat-credits-earned" class="val">0</span></div>
+            <div class="stat-row"><span>⚡ BEST COMBO</span><span id="stat-combo" class="val">×1</span></div>
+            <div class="stat-row"><span>⏱️ SURVIVAL TIME</span><span id="stat-time" class="val">0:00</span></div>
           </div>
           <div class="menu-buttons">
-            <button id="btn-gameover-retry" class="neon-btn btn-primary"><span>DEPLOY AGAIN</span></button>
-            <button id="btn-gameover-garage" class="neon-btn"><span>GARAGE</span></button>
-            <button id="btn-gameover-menu" class="neon-btn"><span>MAIN MENU</span></button>
+            <button id="btn-gameover-retry" class="neon-btn btn-primary"><span>🔄 DEPLOY AGAIN</span></button>
+            <button id="btn-gameover-garage" class="neon-btn"><span>🏎️ GARAGE</span></button>
+            <button id="btn-gameover-menu" class="neon-btn"><span>🏠 MAIN MENU</span></button>
           </div>
         </div>
 
         <!-- VICTORY SCREEN -->
         <div id="menu-victory" class="ui-screen hidden">
-          <h1 class="neon-text-success">VICTORY ACHIEVED</h1>
+          <h1 class="neon-text-success">🏆 VICTORY ACHIEVED</h1>
           <h3 class="neon-text-success">ARENA DOMINATED</h3>
           <div class="stats-panel">
-            <div class="stat-row"><span>TOTAL SCORE</span><span id="vic-score" class="val">0</span></div>
-            <div class="stat-row"><span>WAVES OVERCOME</span><span id="vic-waves" class="val">0</span></div>
-            <div class="stat-row"><span>CREDITS AWARDED</span><span id="vic-credits" class="val">0</span></div>
-            <div class="stat-row"><span>COMPLETION BONUS</span><span class="val">+5,000 CR</span></div>
+            <div class="stat-row"><span>🏆 TOTAL SCORE</span><span id="vic-score" class="val">0</span></div>
+            <div class="stat-row"><span>🌊 WAVES OVERCOME</span><span id="vic-waves" class="val">0</span></div>
+            <div class="stat-row"><span>🪙 CREDITS AWARDED</span><span id="vic-credits" class="val">0</span></div>
+            <div class="stat-row"><span>🎁 COMPLETION BONUS</span><span class="val">+5,000 🪙</span></div>
           </div>
           <div class="menu-buttons">
-            <button id="btn-victory-garage" class="neon-btn btn-primary"><span>UPGRADE VEHICLE</span></button>
-            <button id="btn-victory-menu" class="neon-btn"><span>MAIN MENU</span></button>
+            <button id="btn-victory-garage" class="neon-btn btn-primary"><span>🏎️ UPGRADE VEHICLE</span></button>
+            <button id="btn-victory-menu" class="neon-btn"><span>🏠 MAIN MENU</span></button>
           </div>
         </div>
 
