@@ -638,15 +638,31 @@ export class Player {
     ctx.ellipse(0, 0, 42, 28, 0, 0, Math.PI * 2);
     ctx.fill();
 
+    // Calculate steering angle for front wheels
+    let steerAngle = 0;
+    if (this.game && this.game.input) {
+      if (this.game.input.isTurningLeft()) steerAngle = -0.38;
+      if (this.game.input.isTurningRight()) steerAngle = 0.38;
+    }
+
+    // Micro hover bobbing offset
+    const hoverBob = Math.sin(Date.now() * 0.007) * 1.8;
+    ctx.translate(0, hoverBob);
+
     // 1. Draw Wheels with Animated Spinning Rim Lines & Rubber Treads
     const wheelOffsets = [
-      { x: -16, y: -16 }, { x: 16, y: -16 }, // Front left/right
-      { x: -16, y: 16 }, { x: 16, y: 16 }   // Rear left/right
+      { x: 16, y: -16, isFront: true },  // Front right
+      { x: 16, y: 16, isFront: true },   // Front left
+      { x: -16, y: -16, isFront: false }, // Rear right
+      { x: -16, y: 16, isFront: false }   // Rear left
     ];
 
     wheelOffsets.forEach(w => {
       ctx.save();
       ctx.translate(w.x, w.y);
+      if (w.isFront) {
+        ctx.rotate(steerAngle); // Front wheels physically turn left/right!
+      }
       
       // Rubber tire casing
       ctx.fillStyle = '#080a14';

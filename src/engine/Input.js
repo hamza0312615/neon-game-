@@ -17,9 +17,12 @@ export class Input {
   setupListeners() {
     // Keyboard
     window.addEventListener('keydown', (e) => {
-      const key = e.key.toLowerCase();
+      const key = e.key ? e.key.toLowerCase() : '';
+      const code = e.code ? e.code.toLowerCase() : '';
       this.keys[key] = true;
+      this.keys[e.key] = true;
       this.keys[e.code] = true;
+      this.keys[code] = true;
 
       // Quick weapon swap triggers
       if (this.onWeaponCycleRequest) {
@@ -33,8 +36,12 @@ export class Input {
     });
 
     window.addEventListener('keyup', (e) => {
-      this.keys[e.key.toLowerCase()] = false;
+      const key = e.key ? e.key.toLowerCase() : '';
+      const code = e.code ? e.code.toLowerCase() : '';
+      this.keys[key] = false;
+      this.keys[e.key] = false;
       this.keys[e.code] = false;
+      this.keys[code] = false;
     });
 
     // Mouse wheel scroll to cycle weapons
@@ -160,27 +167,27 @@ export class Input {
 
   // Helper getters to unify input source (keyboard or virtual touch)
   isAccelerating() {
-    return this.keys['w'] || this.keys['arrowup'] || (this.joystick.active && this.joystick.vy < -0.2);
+    return !!(this.keys['w'] || this.keys['KeyW'] || this.keys['keyw'] || this.keys['arrowup'] || this.keys['ArrowUp'] || (this.joystick.active && this.joystick.vy < -0.2));
   }
 
   isReversing() {
-    return this.keys['s'] || this.keys['arrowdown'] || (this.joystick.active && this.joystick.vy > 0.2);
+    return !!(this.keys['s'] || this.keys['KeyS'] || this.keys['keys'] || this.keys['arrowdown'] || this.keys['ArrowDown'] || (this.joystick.active && this.joystick.vy > 0.2));
   }
 
   isTurningLeft() {
-    return this.keys['a'] || this.keys['arrowleft'] || (this.joystick.active && this.joystick.vx < -0.2);
+    return !!(this.keys['a'] || this.keys['KeyA'] || this.keys['keya'] || this.keys['arrowleft'] || this.keys['ArrowLeft'] || (this.joystick.active && this.joystick.vx < -0.2));
   }
 
   isTurningRight() {
-    return this.keys['d'] || this.keys['arrowright'] || (this.joystick.active && this.joystick.vx > 0.2);
+    return !!(this.keys['d'] || this.keys['KeyD'] || this.keys['keyd'] || this.keys['arrowright'] || this.keys['ArrowRight'] || (this.joystick.active && this.joystick.vx > 0.2));
   }
 
   isShooting() {
-    return this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.shootBtn.active;
+    return !!(this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.keys['Space'] || this.shootBtn.active);
   }
 
   isBoosting() {
-    return this.keys['shift'] || this.keys['shiftleft'] || this.boostBtn.active;
+    return !!(this.keys['shift'] || this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.keys['shiftleft'] || this.keys['shiftright'] || this.boostBtn.active);
   }
 
   isPausePressed() {

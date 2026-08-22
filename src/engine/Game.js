@@ -305,10 +305,14 @@ export class Game {
       setTimeout(() => currentScreen.classList.add('active'), 50);
     }
     
+    const hud = document.getElementById('hud');
     if (newState === 'PLAYING') {
-      document.getElementById('hud').classList.remove('hidden');
+      hud.classList.remove('hidden');
+      hud.classList.add('active');
+      this.updateHUD(); // Immediate refresh of health, shield, score, level
     } else {
-      document.getElementById('hud').classList.add('hidden');
+      hud.classList.add('hidden');
+      hud.classList.remove('active');
     }
     
     if (newState === 'GARAGE') {

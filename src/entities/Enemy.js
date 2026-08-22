@@ -772,14 +772,17 @@ export class Drone extends Enemy {
     ctx.fill();
     ctx.stroke();
 
-    // Central Green Sensor Eye
+    // Central Green Sensor Eye (pulsing)
+    const eyeGlow = 3 + Math.sin(Date.now() * 0.01) * 1.5;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath();
-    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+    ctx.arc(0, 0, eyeGlow, 0, Math.PI * 2);
     ctx.fill();
 
-    // Rotor Struts and Blades
+    // Animated Rotor Struts and Spinning Blades
     const offsets = [ {x:-14, y:-14}, {x:14, y:-14}, {x:14, y:14}, {x:-14, y:14} ];
+    const spinAngle = Date.now() * 0.025;
+
     ctx.strokeStyle = 'var(--neon-green)';
     ctx.lineWidth = 1.5;
     
@@ -789,9 +792,20 @@ export class Drone extends Enemy {
       ctx.lineTo(o.x, o.y);
       ctx.stroke();
 
+      // Outer rotor ring
       ctx.beginPath();
-      ctx.arc(o.x, o.y, 5, 0, Math.PI * 2);
+      ctx.arc(o.x, o.y, 6, 0, Math.PI * 2);
       ctx.stroke();
+
+      // Spinning rotor blade cross
+      ctx.save();
+      ctx.translate(o.x, o.y);
+      ctx.rotate(spinAngle);
+      ctx.beginPath();
+      ctx.moveTo(-5, 0); ctx.lineTo(5, 0);
+      ctx.moveTo(0, -5); ctx.lineTo(0, 5);
+      ctx.stroke();
+      ctx.restore();
     });
   }
 }
