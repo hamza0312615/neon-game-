@@ -1,5 +1,6 @@
 import { Projectile } from './Projectile.js';
 import { Weapon } from './Weapons.js';
+import { resolveColor } from '../engine/Colors.js';
 
 export class Player {
   constructor(game, x, y, upgrades) {
@@ -569,9 +570,14 @@ export class Player {
     ctx.arc(0, 4, this.radius, 0, Math.PI*2);
     ctx.fill();
 
+    // Resolve neon variables
+    const colorCyan = resolveColor('var(--neon-cyan)');
+    const colorMagenta = resolveColor('var(--neon-magenta)');
+    const colorRed = resolveColor('var(--neon-red)');
+
     // 1. Draw Wheels (4 small black rectangles)
     ctx.fillStyle = '#0f0f18';
-    ctx.strokeStyle = 'var(--neon-cyan)';
+    ctx.strokeStyle = colorCyan;
     ctx.lineWidth = 1;
     
     const wheelOffsets = [
@@ -586,10 +592,10 @@ export class Player {
 
     // 2. Draw Chassis Wireframe (Futuristic sleek cyan polygon)
     if (this.damageFlash > 0 && Math.floor(Date.now() / 50) % 2 === 0) {
-      ctx.strokeStyle = 'var(--neon-red)';
+      ctx.strokeStyle = colorRed;
       ctx.fillStyle = 'rgba(255, 0, 60, 0.1)';
     } else {
-      ctx.strokeStyle = 'var(--neon-cyan)';
+      ctx.strokeStyle = colorCyan;
       ctx.fillStyle = 'rgba(0, 240, 255, 0.05)';
     }
     
@@ -617,7 +623,7 @@ export class Player {
 
     // Glass cockpit details
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.strokeStyle = 'var(--neon-magenta)';
+    ctx.strokeStyle = colorMagenta;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(8, 0);
@@ -631,7 +637,7 @@ export class Player {
 
     // Booster Exhaust Port (triangle at back)
     ctx.fillStyle = '#0f0f18';
-    ctx.strokeStyle = 'var(--neon-magenta)';
+    ctx.strokeStyle = colorMagenta;
     ctx.beginPath();
     ctx.moveTo(-20, -3);
     ctx.lineTo(-24, 0);
@@ -649,7 +655,7 @@ export class Player {
 
     // Turret Mount Ring (centered)
     ctx.fillStyle = 'rgba(10, 10, 20, 0.9)';
-    ctx.strokeStyle = 'var(--neon-magenta)';
+    ctx.strokeStyle = colorMagenta;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(0, 0, 10, 0, Math.PI*2);
@@ -658,14 +664,14 @@ export class Player {
 
     // Turret barrel gun
     ctx.fillStyle = '#100f1c';
-    ctx.strokeStyle = 'var(--neon-cyan)';
+    ctx.strokeStyle = colorCyan;
     ctx.lineWidth = 1.5;
     // Draw barrel extending forward (right in local space)
     ctx.fillRect(4, -3, 16, 6);
     ctx.strokeRect(4, -3, 16, 6);
     
     // Barrel end tip
-    ctx.fillStyle = 'var(--neon-cyan)';
+    ctx.fillStyle = colorCyan;
     ctx.fillRect(20, -2, 2, 4);
 
     ctx.restore();
@@ -676,7 +682,7 @@ export class Player {
       ctx.strokeStyle = `rgba(0, 240, 255, ${this.shieldFlash * 4})`;
       ctx.lineWidth = 2;
       ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
-      ctx.shadowColor = 'var(--neon-cyan)';
+      ctx.shadowColor = colorCyan;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius + 6, 0, Math.PI*2);
       ctx.stroke();

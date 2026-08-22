@@ -1,4 +1,5 @@
 import { Pickup } from '../entities/Pickup.js';
+import { resolveColor } from '../engine/Colors.js';
 
 export class Arena {
   constructor(width, height) {
@@ -351,7 +352,8 @@ export class Arena {
     this.stations.forEach(st => {
       ctx.save();
       const isHealth = st.type === 'health';
-      const color = isHealth ? 'var(--neon-green)' : 'var(--neon-yellow)';
+      const colorVar = isHealth ? 'var(--neon-green)' : 'var(--neon-yellow)';
+      const color = resolveColor(colorVar);
       
       ctx.strokeStyle = color;
       ctx.lineWidth = 3;
@@ -382,7 +384,8 @@ export class Arena {
       if (o.type === 'concrete') {
         // High walls (dark filled with cyan accents)
         ctx.fillStyle = '#0f0f18';
-        ctx.strokeStyle = 'var(--neon-cyan)';
+        const colorCyan = resolveColor('var(--neon-cyan)');
+        ctx.strokeStyle = colorCyan;
         ctx.lineWidth = 2;
         ctx.fillRect(o.x, o.y, o.width, o.height);
         ctx.strokeRect(o.x, o.y, o.width, o.height);
@@ -417,7 +420,8 @@ export class Arena {
       } else if (o.type === 'barrel') {
         // Fuel barrel (red cylinders)
         ctx.fillStyle = '#1a080c';
-        ctx.strokeStyle = 'var(--neon-red)';
+        const colorRed = resolveColor('var(--neon-red)');
+        ctx.strokeStyle = colorRed;
         ctx.lineWidth = 2.5;
         
         // Draw cylinder
@@ -427,7 +431,7 @@ export class Arena {
         ctx.stroke();
         
         // Draw warning hazard symbol in middle
-        ctx.fillStyle = 'var(--neon-red)';
+        ctx.fillStyle = colorRed;
         ctx.beginPath();
         ctx.arc(o.x + o.width/2, o.y + o.height/2, 4, 0, Math.PI*2);
         ctx.fill();

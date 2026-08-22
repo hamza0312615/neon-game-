@@ -1,3 +1,5 @@
+import { resolveColor } from '../engine/Colors.js';
+
 export class ParticleSystem {
   constructor() {
     this.particles = [];
@@ -131,18 +133,19 @@ export class ParticleSystem {
     ctx.lineWidth = 2.0;
 
     for (let p of this.particles) {
-      ctx.strokeStyle = p.color;
-      ctx.fillStyle = p.color;
+      const resolvedColor = resolveColor(p.color);
+      ctx.strokeStyle = resolvedColor;
+      ctx.fillStyle = resolvedColor;
 
       if (p.isRing) {
         // Render expanding shockwave ring
         ctx.save();
         const ratio = 1 - (p.life / p.maxLife); // 0 to 1
         const curRadius = ratio * p.maxSize;
-        ctx.strokeStyle = p.color;
+        ctx.strokeStyle = resolvedColor;
         ctx.lineWidth = 3 * (1 - ratio);
         ctx.shadowBlur = p.glow ? 12 : 0;
-        ctx.shadowColor = p.color;
+        ctx.shadowColor = resolvedColor;
         
         ctx.beginPath();
         ctx.arc(p.x, p.y, curRadius, 0, Math.PI*2);

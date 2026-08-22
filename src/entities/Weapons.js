@@ -160,13 +160,12 @@ export class Weapon {
 
     // Normal Ammo validation
     if (this.id !== 'laser') {
-      this.ammo--;
       if (this.ammo <= 0) {
-        this.ammo = 0;
         this.reloading = true;
         this.reloadTimer = 0;
         return;
       }
+      this.ammo--;
     }
 
     // Set cooldown timer

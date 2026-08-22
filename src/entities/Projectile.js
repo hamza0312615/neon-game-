@@ -1,3 +1,5 @@
+import { resolveColor } from '../engine/Colors.js';
+
 export class Projectile {
   constructor(game, x, y, vx, vy, damage, radius, color, owner = 'player', type = 'normal', life = 1.5, isCrit = false) {
     this.game = game;
@@ -208,10 +210,11 @@ export class Projectile {
   render(ctx) {
     if (this.type === 'emp_blast') {
       ctx.save();
-      ctx.strokeStyle = `rgba(189, 0, 255, ${this.life / this.maxLife})`;
+      const resolvedEmpColor = resolveColor('var(--neon-purple)');
+      ctx.strokeStyle = resolvedEmpColor;
       ctx.lineWidth = 4;
       ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
-      ctx.shadowColor = 'var(--neon-purple)';
+      ctx.shadowColor = resolvedEmpColor;
       
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.empCurrentRadius, 0, Math.PI*2);
@@ -224,15 +227,27 @@ export class Projectile {
       return;
     }
 
-    if (this.history.length < 2) return;
+    const resolvedColor = resolveColor(this.color);
+
+    if (this.history.length < 2) {
+      ctx.save();
+      ctx.fillStyle = resolvedColor;
+      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
+      ctx.shadowColor = resolvedColor;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+      return;
+    }
 
     ctx.save();
-    ctx.strokeStyle = this.color;
+    ctx.strokeStyle = resolvedColor;
     ctx.lineWidth = this.radius * 2;
     ctx.lineCap = 'round';
     
     ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
-    ctx.shadowColor = this.color;
+    ctx.shadowColor = resolvedColor;
 
     // Draw tracer capsule trail using points history
     ctx.beginPath();
