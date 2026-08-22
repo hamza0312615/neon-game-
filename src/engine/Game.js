@@ -79,6 +79,29 @@ export class Game {
     this.updateMenuStats();
   }
 
+  start() {
+    this.lastTime = performance.now();
+    const loop = (currentTime) => {
+      const dt = Math.min(0.1, (currentTime - this.lastTime) / 1000);
+      this.lastTime = currentTime;
+
+      // Track FPS
+      this.framesThisSecond++;
+      if (currentTime > this.lastFpsUpdate + 1000) {
+        this.fps = this.framesThisSecond;
+        this.framesThisSecond = 0;
+        this.lastFpsUpdate = currentTime;
+      }
+
+      this.update(dt);
+      this.render();
+
+      requestAnimationFrame(loop);
+    };
+
+    requestAnimationFrame(loop);
+  }
+
   handleResize() {
     // Determine screen pixel density
     const dpr = window.devicePixelRatio || 1;
