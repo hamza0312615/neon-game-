@@ -89,16 +89,15 @@ export class Enemy {
     // Float score gain text
     this.game.uiEffects.spawnScoreFloat(this.x, this.y - 20, `+${this.scoreReward * this.game.player.combo}`);
 
-    // Drop pickup resource
+    // Drop pickup resource (100% Drop Rate with increased and randomized rewards!)
     const roll = Math.random();
     let pickupType = 'xp';
-    let pickupVal = this.xpReward;
+    let pickupVal = Math.round(this.xpReward * (1.2 + Math.random() * 0.6)); // +20% base increase + random variance
 
-    if (roll < 0.35) {
+    if (roll < 0.45) {
       pickupType = 'credits';
-      pickupVal = this.creditsReward;
-    } else if (roll < 0.42) {
-      // Chance of recovery power-ups!
+      pickupVal = Math.round(this.creditsReward * (1.5 + Math.random() * 0.8)); // +50% base increase + random variance
+    } else if (roll < 0.62) { // 17% chance of dropping powerups!
       const powerupsPool = ['health', 'shield', 'rapidFire', 'spreadShot', 'damageBoost', 'magnet', 'overdrive'];
       pickupType = powerupsPool[Math.floor(Math.random() * powerupsPool.length)];
       pickupVal = 1; // standard count

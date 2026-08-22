@@ -132,6 +132,13 @@ export class Player {
     if (this.xp >= needed) {
       this.xp -= needed;
       this.level++;
+      
+      // Spawn massive glowing level-up blast wave that deals 60 damage and pushes back all enemies!
+      const levelUpBlast = new Projectile(this.game, this.x, this.y, 0, 0, 60, 30, 'var(--neon-purple)', 'player', 'emp_blast', 0.8, false);
+      levelUpBlast.empMaxRadius = 450; // huge expanding ring
+      this.game.projectiles.push(levelUpBlast);
+      this.game.camera.addTrauma(0.65); // heavy screen shake
+
       this.game.audio.playLevelUp();
       this.triggerLevelUpChoices();
     }
@@ -502,11 +509,13 @@ export class Player {
     const turretRotateSpeed = 9.0; // Lerp speed
     this.turretAngle += angleDiff * turretRotateSpeed * dt;
 
-    // 9. SHOOTING SYSTEM TRIGGER
+    // 9. SHOOTING SYSTEM TRIGGER (Auto-Fire when locked onto an enemy!)
     const currentWeapon = this.weapons[this.activeWeaponIndex];
     currentWeapon.update(dt);
     
-    if (input.isShooting()) {
+    const shouldShoot = input.isShooting() || closestEnemy !== null;
+    
+    if (shouldShoot) {
       if (this.tutorialActive) this.game.advanceTutorial(1);
       
       // Check for weapon quick firing

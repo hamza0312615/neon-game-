@@ -42,7 +42,7 @@ export class WaveManager {
     let subMsg = "PREPARE FOR CONTACT";
     
     // 1. Core wave compositions
-    const scale = 1.0 + (this.waveNumber - 1) * 0.12; // 12% stat scaling
+    const scale = 1.0 + (this.waveNumber - 1) * 0.18; // Increased scaling from 12% to 18% for higher difficulty
     
     if (this.waveNumber === 10) {
       alertTitle.innerText = "BOSS WAVE 10";
@@ -61,7 +61,7 @@ export class WaveManager {
       alertTitle.innerText = `WAVE ${this.waveNumber} (ELITE)`;
       subMsg = "ELITE PHANTOM PATROLS";
       
-      const count = 4 + this.waveNumber / 5;
+      const count = 5 + this.waveNumber / 4;
       for (let i = 0; i < count; i++) {
         this.spawnQueue.push({ type: 'elite_grunt', scale: scale * 1.5 });
       }
@@ -70,13 +70,13 @@ export class WaveManager {
       // Normal Wave
       alertTitle.innerText = `WAVE ${this.waveNumber}`;
       
-      // Procedural filler queue based on wave level
-      const gruntCount = 4 + this.waveNumber * 2;
-      const droneCount = Math.max(0, -2 + this.waveNumber);
-      const tankCount = this.waveNumber >= 3 ? Math.floor(this.waveNumber / 3) : 0;
-      const sniperCount = this.waveNumber >= 4 ? Math.floor(this.waveNumber / 4) : 0;
-      const strikerCount = this.waveNumber >= 6 ? Math.floor(this.waveNumber / 5) : 0;
-      const kamikazeCount = this.waveNumber >= 5 ? Math.floor(this.waveNumber / 4) : 0;
+      // Procedural filler queue based on wave level (increased spawn count)
+      const gruntCount = Math.round(5 + this.waveNumber * 2.4);
+      const droneCount = Math.max(0, -1 + this.waveNumber);
+      const tankCount = this.waveNumber >= 3 ? Math.floor(this.waveNumber / 2.5) : 0;
+      const sniperCount = this.waveNumber >= 4 ? Math.floor(this.waveNumber / 3.0) : 0;
+      const strikerCount = this.waveNumber >= 5 ? Math.floor(this.waveNumber / 4.0) : 0;
+      const kamikazeCount = this.waveNumber >= 5 ? Math.floor(this.waveNumber / 3.5) : 0;
 
       for (let i = 0; i < gruntCount; i++) this.spawnQueue.push({ type: 'grunt', scale });
       for (let i = 0; i < droneCount; i++) this.spawnQueue.push({ type: 'drone', scale });
