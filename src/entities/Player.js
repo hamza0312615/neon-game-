@@ -472,6 +472,7 @@ export class Player {
         closestEnemy = e;
       }
     }
+    this.targetEnemy = closestEnemy;
 
     if (input.touchActive) {
       // Touch: Auto-aim closest enemy. If aiming by touching the right side, manual override.
@@ -695,6 +696,36 @@ export class Player {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius + 6, 0, Math.PI*2);
       ctx.stroke();
+      ctx.restore();
+    }
+
+    // 5. Draw Lock-On Target Reticle over active auto-aim target!
+    if (this.targetEnemy && !this.targetEnemy.isDead) {
+      ctx.save();
+      ctx.translate(this.targetEnemy.x, this.targetEnemy.y);
+      
+      const rot = Date.now() * 0.004;
+      ctx.rotate(rot);
+
+      ctx.strokeStyle = colorMagenta;
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
+      ctx.shadowColor = colorMagenta;
+
+      const r = this.targetEnemy.radius + 12;
+
+      // Outer target ring
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Corner target brackets
+      ctx.fillStyle = colorMagenta;
+      ctx.fillRect(-2, -r - 4, 4, 6);
+      ctx.fillRect(-2, r - 2, 4, 6);
+      ctx.fillRect(-r - 4, -2, 6, 4);
+      ctx.fillRect(r - 2, -2, 6, 4);
+
       ctx.restore();
     }
   }

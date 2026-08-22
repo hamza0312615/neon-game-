@@ -8,9 +8,9 @@ export class FloatingTextSystem {
   }
 
   spawnDamageFloat(x, y, amount, isCrit) {
-    const text = isCrit ? `CRIT! -${amount}` : `-${amount}`;
-    const color = isCrit ? 'var(--neon-yellow)' : '#fff';
-    const size = isCrit ? 'bold 16px Orbitron' : '12px Share Tech Mono';
+    const text = isCrit ? `💥 CRIT! -${amount}` : `-${amount}`;
+    const color = isCrit ? 'var(--neon-yellow)' : 'var(--neon-cyan)';
+    const size = isCrit ? '900 18px Orbitron' : '700 14px Share Tech Mono';
     
     // float upwards with small random horizontal drift
     this.texts.push({
@@ -20,13 +20,13 @@ export class FloatingTextSystem {
       text,
       color,
       font: size,
-      life: 0.8,
-      maxLife: 0.8
+      life: 0.85,
+      maxLife: 0.85
     });
   }
 
   spawnScoreFloat(x, y, text, color = 'var(--neon-green)') {
-    const size = 'bold 12px Orbitron';
+    const size = '700 14px Orbitron';
     this.texts.push({
       x,
       y: y - 10,
@@ -76,14 +76,18 @@ export class FloatingTextSystem {
       else if (t.color === 'var(--neon-cyan)') fillStyle = `rgba(0, 240, 255, ${alpha})`;
       else if (t.color === '#fff') fillStyle = `rgba(255, 255, 255, ${alpha})`;
       
-      ctx.fillStyle = fillStyle;
       ctx.font = t.font;
       
-      // Faint background shadow to make legible over bright arena
-      ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-      ctx.lineWidth = 3.0;
+      // High-contrast background stroke outline
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = fillStyle;
+      ctx.strokeStyle = `rgba(0, 0, 0, ${alpha * 0.95})`;
+      ctx.lineWidth = 4.0;
       ctx.strokeText(t.text, t.x, t.y);
+      
+      ctx.fillStyle = fillStyle;
       ctx.fillText(t.text, t.x, t.y);
+      ctx.shadowBlur = 0;
     }
     
     ctx.restore();

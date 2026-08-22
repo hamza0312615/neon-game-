@@ -53,21 +53,22 @@ export class Camera {
     this.trauma = Math.min(1.0, this.trauma + amount);
   }
 
-  update(playerX, playerY, mouseX, mouseY, dt) {
-    // 1. Calculate base look-ahead offset
-    // mouse coordinates are in screen-space, we find their offset from center of screen
+  update(playerX, playerY, mouseX, mouseY, dt, isTouchActive = false) {
+    // 1. Calculate base look-ahead offset (disabled on touch devices to keep map completely steady)
+    const factor = isTouchActive ? 0 : this.lookAheadFactor;
     const dx = mouseX - this.width / 2;
     const dy = mouseY - this.height / 2;
-    const targetOffsetX = dx * this.lookAheadFactor;
-    const targetOffsetY = dy * this.lookAheadFactor;
+    const targetOffsetX = dx * factor;
+    const targetOffsetY = dy * factor;
 
     // 2. Target coordinates (player center + look-ahead offset)
     const targetX = playerX + targetOffsetX - (this.width / this.zoom) / 2;
     const targetY = playerY + targetOffsetY - (this.height / this.zoom) / 2;
 
     // 3. Lerp towards target position
-    this.x += (targetX - this.x) * this.lerpSpeed;
-    this.y += (targetY - this.y) * this.lerpSpeed;
+    const lerp = isTouchActive ? 0.12 : this.lerpSpeed;
+    this.x += (targetX - this.x) * lerp;
+    this.y += (targetY - this.y) * lerp;
 
     // 4. Clamping camera to world boundaries
     const maxCameraX = this.worldWidth - this.width / this.zoom;
@@ -78,14 +79,16 @@ export class Camera {
     // 5. Update Zoom level
     this.zoom += (this.targetZoom - this.zoom) * this.zoomSpeed * dt;
 
-    // 6. Camera Shake Processing
-    if (this.trauma > 0) {
-      const shakePower = Math.pow(this.trauma, 2); // Exponential decay feels punchier
+    // 6. Camera Shake Processing (clamped on touch devices so screen stays solid)
+    const effectiveTrauma = isTouchActive ? Math.min(0.15, this.trauma) : this.trauma;
+    if (effectiveTrauma > 0) {
+      const shakePower = Math.pow(effectiveTrauma, 2);
       
       this.shakeAngle = Math.random() * Math.PI * 2;
-      this.offsetX = Math.cos(this.shakeAngle) * this.maxShakeOffset * shakePower;
-      this.offsetY = Math.sin(this.shakeAngle) * this.maxShakeOffset * shakePower;
-      this.shakeAngleOffset = (Math.random() * 2 - 1) * this.maxShakeAngle * shakePower;
+      const maxOffset = isTouchActive ? 6 : this.maxShakeOffset;
+      this.offsetX = Math.cos(this.shakeAngle) * maxOffset * shakePower;
+      this.offsetY = Math.sin(this.shakeAngle) * maxOffset * shakePower;
+      this.shakeAngleOffset = isTouchActive ? 0 : (Math.random() * 2 - 1) * this.maxShakeAngle * shakePower;
 
       // Decay trauma
       this.trauma = Math.max(0, this.trauma - this.shakeDecay * dt);

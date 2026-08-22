@@ -242,20 +242,42 @@ export class Projectile {
     }
 
     ctx.save();
-    ctx.strokeStyle = resolvedColor;
-    ctx.lineWidth = this.radius * 2;
     ctx.lineCap = 'round';
-    
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
+    ctx.lineJoin = 'round';
+
+    // 1. Outer Neon Aura
+    ctx.strokeStyle = resolvedColor;
+    ctx.lineWidth = Math.max(6, this.radius * 2.8);
+    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 14 : 0;
     ctx.shadowColor = resolvedColor;
 
-    // Draw tracer capsule trail using points history
     ctx.beginPath();
     ctx.moveTo(this.history[0].x, this.history[0].y);
     for (let i = 1; i < this.history.length; i++) {
       ctx.lineTo(this.history[i].x, this.history[i].y);
     }
     ctx.stroke();
+
+    // 2. Pure White High-Energy Core Line
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = Math.max(3, this.radius * 1.2);
+    ctx.beginPath();
+    ctx.moveTo(this.history[0].x, this.history[0].y);
+    for (let i = 1; i < this.history.length; i++) {
+      ctx.lineTo(this.history[i].x, this.history[i].y);
+    }
+    ctx.stroke();
+
+    // 3. Bright Glowing Bullet Head Tip
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = resolvedColor;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, Math.max(4, this.radius + 1.5), 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
 
     // Rocket body for homing missile
     if (this.type === 'homing') {

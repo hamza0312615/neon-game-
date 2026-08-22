@@ -277,7 +277,6 @@ export class Arena {
   }
 
   renderBackground(ctx, camera) {
-    // Parallax grid lines
     const gridSpacing = 160;
     
     // Determine screen offsets based on camera position
@@ -288,22 +287,36 @@ export class Arena {
 
     ctx.save();
 
-    // Render parallax background skyscrapers in the distance!
-    ctx.strokeStyle = 'rgba(189, 0, 255, 0.08)'; // purple skyline
-    ctx.lineWidth = 1.5;
+    // 1. Draw Player Center Radial Glow Spotlight (Illuminates player area in bright cyan/magenta)
+    const playerScreenX = (this.game.player.x - camera.x) * camera.zoom;
+    const playerScreenY = (this.game.player.y - camera.y) * camera.zoom;
+    
+    const grad = ctx.createRadialGradient(playerScreenX, playerScreenY, 20, playerScreenX, playerScreenY, 650);
+    grad.addColorStop(0, 'rgba(0, 240, 255, 0.14)');
+    grad.addColorStop(0.5, 'rgba(189, 0, 255, 0.07)');
+    grad.addColorStop(1, 'rgba(5, 5, 16, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, camera.width, camera.height);
+
+    // 2. Render parallax background skyscrapers in the distance!
+    ctx.strokeStyle = 'rgba(189, 0, 255, 0.25)'; // bright purple skyline
+    ctx.lineWidth = 2;
     for (let i = 0; i < 8; i++) {
       const bx = ((i * 450 - camera.x * 0.15) % (camera.width + 400)) - 200;
-      const bHeight = 120 + (i % 3) * 110;
-      const bWidth = 90 + (i % 2) * 60;
+      const bHeight = 140 + (i % 3) * 120;
+      const bWidth = 95 + (i % 2) * 60;
       ctx.strokeRect(bx, camera.height - bHeight, bWidth, bHeight);
       
-      // Draw a few window rows inside skyscrapers
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.02)';
+      // Window grid rows inside skyscrapers
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
       ctx.fillRect(bx + 10, camera.height - bHeight + 10, bWidth - 20, bHeight - 20);
     }
 
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)'; // brighter grid lines
+    // 3. High-Contrast Vibrant Grid Lines
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.32)'; // VIBRANT GRID LINES
+    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 6 : 0;
+    ctx.shadowColor = '#00f0ff';
 
     ctx.beginPath();
     // Vertical grid lines
@@ -321,27 +334,27 @@ export class Arena {
       ctx.lineTo(camera.width, screenY);
     }
     ctx.stroke();
+    ctx.shadowBlur = 0;
 
-    // Draw little intersection crosses to make the grid pop
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+    // 4. Glowing intersection crosses
+    ctx.fillStyle = '#00f0ff';
     for (let x = startX; x <= endX; x += gridSpacing) {
       if (x < 0 || x > this.width) continue;
       for (let y = startY; y <= endY; y += gridSpacing) {
         if (y < 0 || y > this.height) continue;
         const screenX = (x - camera.x) * camera.zoom;
         const screenY = (y - camera.y) * camera.zoom;
-        ctx.fillRect(screenX - 4, screenY - 0.5, 8, 1);
-        ctx.fillRect(screenX - 0.5, screenY - 4, 1, 8);
+        ctx.fillRect(screenX - 5, screenY - 1, 10, 2);
+        ctx.fillRect(screenX - 1, screenY - 5, 2, 10);
       }
     }
 
-    // Parallax Star/Dust particles (subtle tech particles floating)
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; // brighter floating stars
-    for (let i = 0; i < 40; i++) {
-      // simple deterministic starfield based on screen grid quadrants
+    // 5. Parallax Star/Dust particles (bright cyber particles)
+    for (let i = 0; i < 50; i++) {
       const sx = ((i * 12345) % camera.width);
       const sy = ((i * 54321) % camera.height);
-      ctx.fillRect(sx, sy, 1.5, 1.5);
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 240, 255, 0.6)' : 'rgba(255, 0, 180, 0.6)';
+      ctx.fillRect(sx, sy, 2, 2);
     }
 
     ctx.restore();

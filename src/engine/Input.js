@@ -51,6 +51,7 @@ export class Input {
 
     // Touch Event Listeners for Mobile / Tablets
     window.addEventListener('touchstart', (e) => {
+      e.preventDefault();
       this.touchActive = true;
       const rect = this.canvas.getBoundingClientRect();
       
@@ -70,7 +71,6 @@ export class Input {
           this.joystick.vy = 0;
         } else if (tx >= rect.width / 2) {
           // Right side handles firing / boost touch regions
-          // Simple buttons defined by coordinates
           if (ty > rect.height * 0.6) {
             this.shootBtn.active = true;
           } else {
@@ -81,6 +81,7 @@ export class Input {
     }, { passive: false });
 
     window.addEventListener('touchmove', (e) => {
+      e.preventDefault();
       const rect = this.canvas.getBoundingClientRect();
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
@@ -117,6 +118,7 @@ export class Input {
     }, { passive: false });
 
     window.addEventListener('touchend', (e) => {
+      e.preventDefault();
       const rect = this.canvas.getBoundingClientRect();
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
@@ -134,7 +136,7 @@ export class Input {
       if (e.touches.length === 0) {
         this.touchActive = false;
       }
-    });
+    }, { passive: false });
   }
 
   // Helper getters to unify input source (keyboard or virtual touch)

@@ -267,26 +267,47 @@ export class Enemy {
     ctx.arc(0, 3, this.radius, 0, Math.PI*2);
     ctx.fill();
 
+    const resolvedCol = resolveColor(this.color);
+
     // Flash colors on taking damage, or glitched purple when disabled/stunned
     if (this.isStunned() && Math.floor(Date.now() / 100) % 2 === 0) {
       ctx.strokeStyle = resolveColor('var(--neon-purple)');
-      ctx.fillStyle = 'rgba(189, 0, 255, 0.2)';
+      ctx.fillStyle = 'rgba(189, 0, 255, 0.3)';
     } else if (this.damageFlash > 0 && Math.floor(Date.now() / 50) % 2 === 0) {
       ctx.strokeStyle = '#fff';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     } else {
-      ctx.strokeStyle = resolveColor(this.color);
-      ctx.fillStyle = 'rgba(255, 0, 60, 0.03)';
+      ctx.strokeStyle = resolvedCol;
+      ctx.fillStyle = resolvedCol;
+      ctx.globalAlpha = 0.25;
     }
 
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 8 : 0;
+    ctx.lineWidth = 2.5;
+    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
     ctx.shadowColor = ctx.strokeStyle;
 
     this.drawChassis(ctx);
+    ctx.globalAlpha = 1.0;
     
     ctx.shadowBlur = 0;
     ctx.restore();
+
+    // Draw overhead HP Bar if damaged
+    if (this.hp < this.maxHp) {
+      ctx.save();
+      const barW = Math.max(28, this.radius * 1.8);
+      const barH = 4;
+      const bx = this.x - barW / 2;
+      const by = this.y - this.radius - 12;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      ctx.fillRect(bx - 1, by - 1, barW + 2, barH + 2);
+
+      const ratio = Math.max(0, this.hp / this.maxHp);
+      ctx.fillStyle = ratio > 0.5 ? '#39ff14' : (ratio > 0.25 ? '#ffea00' : '#ff003c');
+      ctx.fillRect(bx, by, barW * ratio, barH);
+      ctx.restore();
+    }
 
     this.drawCustomEffects(ctx);
   }

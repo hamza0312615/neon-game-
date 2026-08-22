@@ -83,49 +83,49 @@ export class Pickup {
     switch (this.type) {
       case 'xp':
         player.addXp(this.value);
-        displayMsg = `+${Math.round(this.value * player.xpMultiplier)} XP`;
+        displayMsg = `+${Math.round(this.value * player.xpMultiplier)} ⭐`;
         break;
 
       case 'credits':
         this.game.creditsEarned += this.value;
-        displayMsg = `+${this.value} CR`;
+        displayMsg = `+${this.value} 🪙`;
         break;
 
       case 'health':
         player.hp = Math.min(player.maxHp, player.hp + 25);
-        displayMsg = "REPAIR +25";
+        displayMsg = "REPAIR +25 ❤️";
         this.game.particles.spawnShieldPulse(player.x, player.y, player.radius + 8, 'var(--neon-green)');
         break;
 
       case 'shield':
         player.shield = Math.min(player.maxShield, player.shield + 30);
-        displayMsg = "SHIELD +30";
+        displayMsg = "SHIELD +30 🛡️";
         this.game.particles.spawnShieldPulse(player.x, player.y, player.radius + 8, 'var(--neon-cyan)');
         break;
 
       case 'rapidFire':
         player.powerups.rapidFire = 8.0; // 8 seconds duration
-        displayMsg = "RAPID FIRE";
+        displayMsg = "RAPID FIRE ⚡";
         break;
 
       case 'spreadShot':
         player.powerups.spreadShot = 8.0;
-        displayMsg = "SPREAD BULLETS";
+        displayMsg = "SPREAD BULLETS 💥";
         break;
 
       case 'damageBoost':
         player.powerups.damageBoost = 8.0;
-        displayMsg = "DOUBLE DAMAGE";
+        displayMsg = "DOUBLE DAMAGE 🔥";
         break;
 
       case 'magnet':
         player.powerups.magnet = 10.0;
-        displayMsg = "GRAVITY MAGNET";
+        displayMsg = "GRAVITY MAGNET 🧲";
         break;
 
       case 'overdrive':
         player.powerups.overdrive = 5.0; // invulnerability and boost
-        displayMsg = "OVERDRIVE ENGAGED";
+        displayMsg = "OVERDRIVE ENGAGED 🚀";
         this.game.camera.addTrauma(0.4);
         this.game.particles.spawnShieldPulse(player.x, player.y, 110, 'var(--neon-yellow)');
         break;

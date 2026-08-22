@@ -500,7 +500,7 @@ export class Game {
     
     // Update Camera
     const mouseWorld = this.camera.screenToWorld(this.input.mouse.x, this.input.mouse.y);
-    this.camera.update(this.player.x, this.player.y, this.input.mouse.x, this.input.mouse.y, dt);
+    this.camera.update(this.player.x, this.player.y, this.input.mouse.x, this.input.mouse.y, dt, this.input.touchActive);
     
     // Update Waves
     this.waveManager.update(dt);
