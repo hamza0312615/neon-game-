@@ -287,19 +287,21 @@ export class Arena {
 
     ctx.save();
 
-    // 1. Draw Player Center Radial Glow Spotlight (Illuminates player area in bright cyan/magenta)
-    const playerScreenX = (this.game.player.x - camera.x) * camera.zoom;
-    const playerScreenY = (this.game.player.y - camera.y) * camera.zoom;
+    // 1. Draw Player Center Radial Glow Spotlight (Illuminates player area in bright Electric Cyan & Gold)
+    const playerX = (this.game && this.game.player) ? this.game.player.x : camera.x + camera.width / 2;
+    const playerY = (this.game && this.game.player) ? this.game.player.y : camera.y + camera.height / 2;
+    const playerScreenX = (playerX - camera.x) * camera.zoom;
+    const playerScreenY = (playerY - camera.y) * camera.zoom;
     
     const grad = ctx.createRadialGradient(playerScreenX, playerScreenY, 20, playerScreenX, playerScreenY, 650);
-    grad.addColorStop(0, 'rgba(0, 240, 255, 0.14)');
-    grad.addColorStop(0.5, 'rgba(189, 0, 255, 0.07)');
-    grad.addColorStop(1, 'rgba(5, 5, 16, 0)');
+    grad.addColorStop(0, 'rgba(0, 240, 255, 0.18)');
+    grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.08)');
+    grad.addColorStop(1, 'rgba(6, 8, 20, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, camera.width, camera.height);
 
     // 2. Render parallax background skyscrapers in the distance!
-    ctx.strokeStyle = 'rgba(189, 0, 255, 0.25)'; // bright purple skyline
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.22)'; // bright cyan skyline
     ctx.lineWidth = 2;
     for (let i = 0; i < 8; i++) {
       const bx = ((i * 450 - camera.x * 0.15) % (camera.width + 400)) - 200;
@@ -308,7 +310,7 @@ export class Arena {
       ctx.strokeRect(bx, camera.height - bHeight, bWidth, bHeight);
       
       // Window grid rows inside skyscrapers
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.08)';
+      ctx.fillStyle = i % 2 === 0 ? 'rgba(0, 240, 255, 0.09)' : 'rgba(255, 234, 0, 0.08)';
       ctx.fillRect(bx + 10, camera.height - bHeight + 10, bWidth - 20, bHeight - 20);
     }
 

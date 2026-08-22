@@ -32,6 +32,10 @@ export class Player {
     this.turretAngle = 0;
     this.recoilForce = 0;
     
+    // Animation properties
+    this.wheelAngle = 0;
+    this.recoilAnim = 0;
+    
     // Combo multiplier
     this.combo = 1;
     this.comboTimer = 0;
@@ -514,6 +518,13 @@ export class Player {
     const currentWeapon = this.weapons[this.activeWeaponIndex];
     currentWeapon.update(dt);
     
+    // Update car animation states
+    const speed = Math.hypot(this.vx, this.vy);
+    this.wheelAngle += speed * dt * 0.2;
+    if (this.recoilAnim > 0) {
+      this.recoilAnim = Math.max(0, this.recoilAnim - dt * 50);
+    }
+
     const shouldShoot = input.isShooting() || closestEnemy !== null;
     
     if (shouldShoot) {
@@ -523,7 +534,10 @@ export class Player {
       const spreadActive = this.powerups.spreadShot > 0;
       const fireMultiplier = this.powerups.rapidFire > 0 ? 1.6 : 1.0;
       
-      currentWeapon.fire(this.x, this.y, this.turretAngle, this.vx, this.vy, this.damageMultiplier, this.fireRateMultiplier * fireMultiplier, spreadActive);
+      const fired = currentWeapon.fire(this.x, this.y, this.turretAngle, this.vx, this.vy, this.damageMultiplier, this.fireRateMultiplier * fireMultiplier, spreadActive);
+      if (fired) {
+        this.recoilAnim = 7; // recoil gun barrel backwards 7px on fire!
+      }
     } else {
       currentWeapon.stopContinuousLaser();
     }
@@ -585,7 +599,7 @@ export class Player {
     const colorMagenta = resolveColor('var(--neon-magenta)');
     const colorRed = resolveColor('var(--neon-red)');
 
-    // 1. Draw Wheels (4 small black rectangles)
+    // 1. Draw Wheels with Animated Spinning Tread Lines
     ctx.fillStyle = '#0f0f18';
     ctx.strokeStyle = colorCyan;
     ctx.lineWidth = 1;
@@ -596,8 +610,20 @@ export class Player {
     ];
     
     wheelOffsets.forEach(w => {
-      ctx.fillRect(w.x - 6, w.y - 3, 12, 6);
-      ctx.strokeRect(w.x - 6, w.y - 3, 12, 6);
+      ctx.save();
+      ctx.translate(w.x, w.y);
+      ctx.fillRect(-6, -3, 12, 6);
+      ctx.strokeRect(-6, -3, 12, 6);
+      
+      // Animated tire tread line spinning with velocity
+      ctx.strokeStyle = colorCyan;
+      ctx.lineWidth = 1.2;
+      const spinOffset = (this.wheelAngle % 8) - 4;
+      ctx.beginPath();
+      ctx.moveTo(spinOffset, -3);
+      ctx.lineTo(spinOffset, 3);
+      ctx.stroke();
+      ctx.restore();
     });
 
     // 2. Draw Chassis Wireframe (Futuristic sleek cyan polygon)
@@ -647,7 +673,7 @@ export class Player {
 
     // Booster Exhaust Port (triangle at back)
     ctx.fillStyle = '#0f0f18';
-    ctx.strokeStyle = colorMagenta;
+    ctx.strokeStyle = colorCyan;
     ctx.beginPath();
     ctx.moveTo(-20, -3);
     ctx.lineTo(-24, 0);
@@ -655,6 +681,30 @@ export class Player {
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
+
+    // Animated Thruster Jet Flame (Flickering rocket exhaust flame)
+    const moveSpeed = Math.hypot(this.vx, this.vy);
+    if (moveSpeed > 10 || this.isBoosting) {
+      ctx.save();
+      const flameLen = (this.isBoosting ? 28 : 14) + Math.random() * 8;
+      
+      const grad = ctx.createLinearGradient(-24, 0, -24 - flameLen, 0);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.3, '#ffea00');
+      grad.addColorStop(1, 'rgba(0, 240, 255, 0)');
+      
+      ctx.fillStyle = grad;
+      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
+      ctx.shadowColor = '#ffea00';
+
+      ctx.beginPath();
+      ctx.moveTo(-24, -4);
+      ctx.lineTo(-24 - flameLen, 0);
+      ctx.lineTo(-24, 4);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
 
     ctx.restore();
 
@@ -672,17 +722,18 @@ export class Player {
     ctx.fill();
     ctx.stroke();
 
-    // Turret barrel gun
+    // Turret barrel gun (with animated recoil kickback!)
     ctx.fillStyle = '#100f1c';
     ctx.strokeStyle = colorCyan;
     ctx.lineWidth = 1.5;
-    // Draw barrel extending forward (right in local space)
-    ctx.fillRect(4, -3, 16, 6);
-    ctx.strokeRect(4, -3, 16, 6);
+    
+    const recoilX = 4 - this.recoilAnim; // Recoil barrel backwards 7px on fire!
+    ctx.fillRect(recoilX, -3, 16, 6);
+    ctx.strokeRect(recoilX, -3, 16, 6);
     
     // Barrel end tip
     ctx.fillStyle = colorCyan;
-    ctx.fillRect(20, -2, 2, 4);
+    ctx.fillRect(recoilX + 16, -2, 2, 4);
 
     ctx.restore();
     
