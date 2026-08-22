@@ -84,7 +84,7 @@ body, html {
   visibility: visible;
 }
 
-.ui-screen.hidden {
+.hidden {
   display: none !important;
 }
 
