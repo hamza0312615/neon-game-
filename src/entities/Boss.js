@@ -643,7 +643,7 @@ export class OmegaCore extends Boss {
       const colorCyan = resolveColor('var(--neon-cyan)');
       ctx.strokeStyle = colorCyan;
       ctx.lineWidth = 2;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 8 : 0;
+      ctx.shadowBlur = (this.game?.saveData?.settings?.glowEnabled ?? true) ? 8 : 0;
       ctx.shadowColor = colorCyan;
       
       ctx.beginPath();
@@ -671,7 +671,7 @@ export class OmegaCore extends Boss {
     if (this.isSweeping) {
       ctx.save();
       ctx.strokeStyle = 'rgba(255, 0, 60, 0.7)';
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
+      ctx.shadowBlur = (this.game?.saveData?.settings?.glowEnabled ?? true) ? 15 : 0;
       ctx.shadowColor = resolveColor('var(--neon-red)');
       ctx.lineWidth = 6;
       

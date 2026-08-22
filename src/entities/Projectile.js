@@ -58,7 +58,7 @@ export class Projectile {
     }
 
     // Spawn movement particle trails
-    if (this.game.saveData.settings.particlesQuality !== 'low' && Math.random() < 0.25) {
+    if (this.game?.saveData?.settings?.particlesQuality !== 'low' && Math.random() < 0.25) {
       if (this.type === 'normal') {
         this.game.particles.spawnParticle({
           x: this.x, y: this.y,
@@ -213,7 +213,8 @@ export class Projectile {
       const resolvedEmpColor = resolveColor('var(--neon-purple)');
       ctx.strokeStyle = resolvedEmpColor;
       ctx.lineWidth = 4;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
+      const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+      ctx.shadowBlur = isGlow ? 15 : 0;
       ctx.shadowColor = resolvedEmpColor;
       
       ctx.beginPath();
@@ -232,7 +233,8 @@ export class Projectile {
     if (this.history.length < 2) {
       ctx.save();
       ctx.fillStyle = resolvedColor;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
+      const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+      ctx.shadowBlur = isGlow ? 10 : 0;
       ctx.shadowColor = resolvedColor;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
@@ -248,7 +250,8 @@ export class Projectile {
     // 1. Outer Neon Aura
     ctx.strokeStyle = resolvedColor;
     ctx.lineWidth = Math.max(6, this.radius * 2.8);
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 14 : 0;
+    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+    ctx.shadowBlur = isGlow ? 14 : 0;
     ctx.shadowColor = resolvedColor;
 
     ctx.beginPath();

@@ -317,7 +317,8 @@ export class Arena {
     // 3. High-Contrast Vibrant Grid Lines
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = 'rgba(0, 240, 255, 0.32)'; // VIBRANT GRID LINES
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 6 : 0;
+    const glowEnabled = this.game?.saveData?.settings?.glowEnabled ?? true;
+    ctx.shadowBlur = glowEnabled ? 6 : 0;
     ctx.shadowColor = '#00f0ff';
 
     ctx.beginPath();
@@ -397,17 +398,16 @@ export class Arena {
       ctx.save();
       
       if (o.type === 'concrete') {
-        // High walls (dark filled with cyan accents)
-        ctx.fillStyle = '#0f0f18';
-        const colorCyan = resolveColor('var(--neon-cyan)');
-        ctx.strokeStyle = colorCyan;
-        ctx.lineWidth = 2;
+        // High walls (Bright Electric Cyan)
+        ctx.fillStyle = 'rgba(0, 180, 255, 0.35)';
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 3;
         ctx.fillRect(o.x, o.y, o.width, o.height);
         ctx.strokeRect(o.x, o.y, o.width, o.height);
         
         // Cross diagonal lines inside for wireframe texture
-        ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(o.x, o.y);
         ctx.lineTo(o.x + o.width, o.y + o.height);
@@ -415,29 +415,29 @@ export class Arena {
         ctx.lineTo(o.x, o.y + o.height);
         ctx.stroke();
       } else if (o.type === 'crate') {
-        // Wooden/metal cargo container (brownish red neon accents)
-        ctx.fillStyle = '#1c1613';
-        ctx.strokeStyle = '#bf6f30';
-        ctx.lineWidth = 2.5;
+        // Cargo container (Bright Glowing Amber Gold + Hazard Borders)
+        ctx.fillStyle = 'rgba(255, 170, 0, 0.45)';
+        ctx.strokeStyle = '#ffaa00';
+        ctx.lineWidth = 3;
         ctx.fillRect(o.x, o.y, o.width, o.height);
         ctx.strokeRect(o.x, o.y, o.width, o.height);
 
         // Draw inner box
-        ctx.strokeRect(o.x + 6, o.y + 6, o.width - 12, o.height - 12);
+        ctx.strokeRect(o.x + 5, o.y + 5, o.width - 10, o.height - 10);
         
         // Show HP bar above crate if damaged
         if (o.health < o.maxHealth) {
-          ctx.fillStyle = 'rgba(255, 0, 60, 0.4)';
-          ctx.fillRect(o.x, o.y - 8, o.width, 3);
-          ctx.fillStyle = 'rgba(57, 255, 20, 0.8)';
-          ctx.fillRect(o.x, o.y - 8, o.width * (o.health / o.maxHealth), 3);
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.fillRect(o.x, o.y - 8, o.width, 4);
+          ctx.fillStyle = '#39ff14';
+          ctx.fillRect(o.x, o.y - 8, o.width * (o.health / o.maxHealth), 4);
         }
       } else if (o.type === 'barrel') {
-        // Fuel barrel (red cylinders)
-        ctx.fillStyle = '#1a080c';
+        // Fuel barrel (Bright Neon Red cylinders)
+        ctx.fillStyle = 'rgba(255, 0, 60, 0.55)';
         const colorRed = resolveColor('var(--neon-red)');
         ctx.strokeStyle = colorRed;
-        ctx.lineWidth = 2.5;
+        ctx.lineWidth = 3;
         
         // Draw cylinder
         ctx.beginPath();
@@ -446,7 +446,10 @@ export class Arena {
         ctx.stroke();
         
         // Draw warning hazard symbol in middle
-        ctx.fillStyle = colorRed;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(o.x + o.width/2, o.y + o.height/2, 4, 0, Math.PI*2);
+        ctx.fill();
         ctx.beginPath();
         ctx.arc(o.x + o.width/2, o.y + o.height/2, 4, 0, Math.PI*2);
         ctx.fill();

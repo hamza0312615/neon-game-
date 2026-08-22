@@ -57,7 +57,7 @@ export class Player {
     ];
     
     // Equip selected weapon from garage
-    const selectedWeapon = this.game.saveData.progression.activeWeapon || 'plasma';
+    const selectedWeapon = this.game?.saveData?.progression?.activeWeapon || 'plasma';
     this.activeWeaponIndex = this.weapons.findIndex(w => w.id === selectedWeapon);
     if (this.activeWeaponIndex === -1) this.activeWeaponIndex = 0;
 
@@ -626,16 +626,31 @@ export class Player {
       ctx.restore();
     });
 
-    // 2. Draw Chassis Wireframe (Futuristic sleek cyan polygon)
+    // 0. Headlight Beam Cones (projecting forward 180px)
+    ctx.save();
+    const headGrad = ctx.createRadialGradient(22, 0, 5, 180, 0, 180);
+    headGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
+    headGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.15)');
+    headGrad.addColorStop(1, 'rgba(0, 240, 255, 0)');
+    ctx.fillStyle = headGrad;
+    ctx.beginPath();
+    ctx.moveTo(22, 0);
+    ctx.lineTo(180, -45);
+    ctx.lineTo(180, 45);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 2. Draw Chassis Body (Vibrant Cyan Solid Core + Bold Neon Yellow Border)
     if (this.damageFlash > 0 && Math.floor(Date.now() / 50) % 2 === 0) {
-      ctx.strokeStyle = colorRed;
-      ctx.fillStyle = 'rgba(255, 0, 60, 0.1)';
+      ctx.strokeStyle = '#ffffff';
+      ctx.fillStyle = '#ff003c';
     } else {
-      ctx.strokeStyle = colorCyan;
-      ctx.fillStyle = 'rgba(0, 240, 255, 0.05)';
+      ctx.strokeStyle = '#ffea00'; // Bold Neon Yellow Outline
+      ctx.fillStyle = '#00c8ff';   // Solid Vibrant Electric Cyan Body!
     }
     
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 3.0;
     
     // Sleek vector car shape path
     ctx.beginPath();
@@ -648,19 +663,27 @@ export class Player {
     ctx.lineTo(14, 13);      // front left
     ctx.closePath();
     
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
-    ctx.shadowColor = ctx.strokeStyle;
+    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+    ctx.shadowBlur = isGlow ? 15 : 0;
+    ctx.shadowColor = '#00f0ff';
     
     ctx.fill();
     ctx.stroke();
 
+    // Front glowing Headlight dots
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffffff';
+    ctx.fillRect(14, -12, 4, 3);
+    ctx.fillRect(14, 9, 4, 3);
+
     // Reset shadow for inner details
     ctx.shadowBlur = 0;
 
-    // Glass cockpit details
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.strokeStyle = colorMagenta;
-    ctx.lineWidth = 1;
+    // Glass cockpit details (Glowing White/Cyan Dome)
+    ctx.fillStyle = '#003366';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(8, 0);
     ctx.lineTo(0, -6);
@@ -742,7 +765,7 @@ export class Player {
       ctx.save();
       ctx.strokeStyle = `rgba(0, 240, 255, ${this.shieldFlash * 4})`;
       ctx.lineWidth = 2;
-      ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
+      ctx.shadowBlur = isGlow ? 15 : 0;
       ctx.shadowColor = colorCyan;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.radius + 6, 0, Math.PI*2);

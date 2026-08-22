@@ -52,8 +52,8 @@ export class Enemy {
     this.game.audio.playHit();
     
     // Floating damage numbers
-    if (this.game.saveData.settings.damageNumbersEnabled) {
-      this.game.uiEffects.spawnDamageFloat(this.x, this.y - 20, amount, isCrit);
+    if (this.game?.saveData?.settings?.damageNumbersEnabled ?? true) {
+      this.game.uiEffects.spawnDamageFloat(this.x, this.y, Math.round(amount), isCrit);
     }
     
     // Spark effects
@@ -277,14 +277,15 @@ export class Enemy {
       ctx.strokeStyle = '#fff';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     } else {
-      ctx.strokeStyle = resolvedCol;
+      ctx.strokeStyle = '#ffffff';
       ctx.fillStyle = resolvedCol;
-      ctx.globalAlpha = 0.25;
+      ctx.globalAlpha = 0.75;
     }
 
-    ctx.lineWidth = 2.5;
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
-    ctx.shadowColor = ctx.strokeStyle;
+    ctx.lineWidth = 3.0;
+    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+    ctx.shadowBlur = isGlow ? 14 : 0;
+    ctx.shadowColor = resolvedCol;
 
     this.drawChassis(ctx);
     ctx.globalAlpha = 1.0;

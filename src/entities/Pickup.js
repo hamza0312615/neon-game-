@@ -170,7 +170,8 @@ export class Pickup {
       return;
     }
 
-    ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 10 : 0;
+    const isGlow = this.game?.saveData?.settings?.glowEnabled ?? true;
+    ctx.shadowBlur = isGlow ? 10 : 0;
     ctx.shadowColor = color;
 
     // Draw customized shape depending on type
