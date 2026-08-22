@@ -1,5 +1,6 @@
 import { Enemy } from './Enemy.js';
 import { Projectile } from './Projectile.js';
+import { resolveColor } from '../engine/Colors.js';
 
 // Base Boss class extending Enemy
 export class Boss extends Enemy {
@@ -221,7 +222,7 @@ export class Titan extends Boss {
     ctx.strokeRect(15, 10, 25, 6);
 
     // Phase plate details
-    ctx.strokeStyle = this.bossPhase >= 4 ? 'var(--neon-red)' : 'var(--neon-magenta)';
+    ctx.strokeStyle = resolveColor(this.bossPhase >= 4 ? 'var(--neon-red)' : 'var(--neon-magenta)');
     ctx.beginPath();
     ctx.arc(0, 0, 18, 0, Math.PI*2);
     ctx.stroke();
@@ -415,7 +416,7 @@ export class VoidRacer extends Boss {
     ctx.stroke();
 
     // Glow engine wings
-    ctx.strokeStyle = 'var(--neon-cyan)';
+    ctx.strokeStyle = resolveColor('var(--neon-cyan)');
     ctx.beginPath();
     ctx.moveTo(-10, -18); ctx.lineTo(-14, -6);
     ctx.moveTo(-10, 18); ctx.lineTo(-14, 6);
@@ -618,13 +619,13 @@ export class OmegaCore extends Boss {
     // Rotating internal gears
     ctx.save();
     ctx.rotate(-this.shieldAngle * 0.5);
-    ctx.strokeStyle = 'var(--neon-magenta)';
+    ctx.strokeStyle = resolveColor('var(--neon-magenta)');
     ctx.lineWidth = 1.5;
     ctx.strokeRect(-25, -25, 50, 50);
     ctx.restore();
 
     // Center core neon dome
-    ctx.fillStyle = this.bossPhase === 4 ? 'var(--neon-red)' : 'var(--neon-purple)';
+    ctx.fillStyle = resolveColor(this.bossPhase === 4 ? 'var(--neon-red)' : 'var(--neon-purple)');
     ctx.beginPath();
     ctx.arc(0, 0, 15, 0, Math.PI*2);
     ctx.fill();
@@ -639,10 +640,11 @@ export class OmegaCore extends Boss {
       
       ctx.save();
       ctx.fillStyle = '#0f0f18';
-      ctx.strokeStyle = 'var(--neon-cyan)';
+      const colorCyan = resolveColor('var(--neon-cyan)');
+      ctx.strokeStyle = colorCyan;
       ctx.lineWidth = 2;
       ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 8 : 0;
-      ctx.shadowColor = 'var(--neon-cyan)';
+      ctx.shadowColor = colorCyan;
       
       ctx.beginPath();
       ctx.arc(sh.x, sh.y, sh.radius, 0, Math.PI*2);
@@ -650,7 +652,7 @@ export class OmegaCore extends Boss {
       ctx.stroke();
       
       // Draw shield inner core details
-      ctx.fillStyle = 'var(--neon-cyan)';
+      ctx.fillStyle = colorCyan;
       ctx.beginPath();
       ctx.arc(sh.x, sh.y, 4, 0, Math.PI*2);
       ctx.fill();
@@ -660,17 +662,17 @@ export class OmegaCore extends Boss {
       ctx.save();
       ctx.fillStyle = 'rgba(255, 0, 60, 0.4)';
       ctx.fillRect(sh.x - 14, sh.y - 22, 28, 2);
-      ctx.fillStyle = 'var(--neon-cyan)';
+      ctx.fillStyle = colorCyan;
       ctx.fillRect(sh.x - 14, sh.y - 22, 28 * (sh.hp / sh.maxHp), 2);
       ctx.restore();
     });
-
+ 
     // Render laser sweep telegraph beams
     if (this.isSweeping) {
       ctx.save();
       ctx.strokeStyle = 'rgba(255, 0, 60, 0.7)';
       ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 15 : 0;
-      ctx.shadowColor = 'var(--neon-red)';
+      ctx.shadowColor = resolveColor('var(--neon-red)');
       ctx.lineWidth = 6;
       
       const sweepCoord = this.sweepAxis === 'x' 

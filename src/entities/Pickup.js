@@ -1,3 +1,5 @@
+import { resolveColor } from '../engine/Colors.js';
+
 export class Pickup {
   constructor(game, x, y, type, value = 1) {
     this.game = game;
@@ -76,7 +78,7 @@ export class Pickup {
     this.game.audio.playPickup();
 
     let displayMsg = '';
-    const color = this.getColor();
+    const color = resolveColor(this.getColor());
 
     switch (this.type) {
       case 'xp':
@@ -158,7 +160,7 @@ export class Pickup {
     ctx.save();
     ctx.translate(this.x, drawY);
 
-    const color = this.getColor();
+    const color = resolveColor(this.getColor());
     ctx.strokeStyle = color;
     ctx.lineWidth = 1.5;
     

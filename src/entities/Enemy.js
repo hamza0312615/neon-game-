@@ -1,5 +1,6 @@
 import { Projectile } from './Projectile.js';
 import { Pickup } from './Pickup.js';
+import { resolveColor } from '../engine/Colors.js';
 
 export class Enemy {
   constructor(game, x, y, type, waveScale = 1.0) {
@@ -269,13 +270,13 @@ export class Enemy {
 
     // Flash colors on taking damage, or glitched purple when disabled/stunned
     if (this.isStunned() && Math.floor(Date.now() / 100) % 2 === 0) {
-      ctx.strokeStyle = 'var(--neon-purple)';
+      ctx.strokeStyle = resolveColor('var(--neon-purple)');
       ctx.fillStyle = 'rgba(189, 0, 255, 0.2)';
     } else if (this.damageFlash > 0 && Math.floor(Date.now() / 50) % 2 === 0) {
       ctx.strokeStyle = '#fff';
       ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     } else {
-      ctx.strokeStyle = this.color;
+      ctx.strokeStyle = resolveColor(this.color);
       ctx.fillStyle = 'rgba(255, 0, 60, 0.03)';
     }
 
@@ -534,7 +535,7 @@ export class Sniper extends Enemy {
       ctx.stroke();
       
       // Target dot at end
-      ctx.fillStyle = 'var(--neon-red)';
+      ctx.fillStyle = resolveColor('var(--neon-red)');
       ctx.beginPath();
       ctx.arc(this.lockX, this.lockY, 3, 0, Math.PI*2);
       ctx.fill();
