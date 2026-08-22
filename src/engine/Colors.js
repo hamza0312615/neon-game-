@@ -19,8 +19,11 @@ export function resolveColor(color) {
   if (typeof color !== 'string') return color;
   if (!color) return '#ffffff';
   if (color.startsWith('var(--neon-')) {
-    const name = color.substring(11, color.length - 1).trim(); // extracts name from 'var(--neon-name)'
-    return Colors[name] || '#00e5ff';
+    const match = color.match(/var\(--neon-([a-zA-Z0-9]+)\)/);
+    if (match && match[1]) {
+      const name = match[1].toLowerCase();
+      return Colors[name] || '#00e5ff';
+    }
   }
   return color;
 }

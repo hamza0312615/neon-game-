@@ -294,7 +294,7 @@ body, html {
   display: none !important;
 }
 
-.hud-panel {
+.hud-group, .hud-panel {
   position: absolute;
   display: flex;
   flex-direction: column;
