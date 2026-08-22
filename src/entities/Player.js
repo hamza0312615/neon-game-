@@ -78,6 +78,36 @@ export class Player {
     };
   }
 
+  isWeaponUnlocked(weaponId) {
+    const unlockWaves = { plasma: 0, spread: 3, railgun: 7, missile: 12, laser: 16, emp: 20 };
+    const reqWave = unlockWaves[weaponId] || 0;
+    return (this.game?.saveData?.progression?.highestWave || 1) >= reqWave;
+  }
+
+  cycleWeapon(dir = 1) {
+    let nextIdx = this.activeWeaponIndex;
+    for (let i = 0; i < this.weapons.length; i++) {
+      nextIdx = (nextIdx + dir + this.weapons.length) % this.weapons.length;
+      if (this.isWeaponUnlocked(this.weapons[nextIdx].id)) {
+        this.selectWeaponIndex(nextIdx);
+        break;
+      }
+    }
+  }
+
+  selectWeaponIndex(index) {
+    if (index < 0 || index >= this.weapons.length) return;
+    const targetWeapon = this.weapons[index];
+    if (!this.isWeaponUnlocked(targetWeapon.id)) return;
+
+    if (this.activeWeaponIndex !== index) {
+      this.activeWeaponIndex = index;
+      this.game.saveData.progression.activeWeapon = targetWeapon.id;
+      this.game.audio.playUIClick();
+      this.game.uiEffects.spawnScoreFloat(this.x, this.y - 45, `EQUIPPED: ${targetWeapon.name.toUpperCase()}`, 'var(--neon-green)');
+    }
+  }
+
   initStats() {
     const getVal = (cat, base, step) => base + (this.upgrades[cat] - 1) * step;
 

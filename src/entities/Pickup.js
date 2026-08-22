@@ -42,33 +42,35 @@ export class Pickup {
     const dy = player.y - this.y;
     const dist = Math.hypot(dx, dy);
 
-    // Unify pick-up range: normal upgraded range, or full map pull if MAGNET power-up is active!
-    const activeMagnet = player.powerups.magnet > 0 || this.type === 'overdrive';
-    const range = activeMagnet ? 3000 : player.pickupRadius;
+    // Auto-collect range: Base range expanded to 220px minimum, or 3000px if Magnet active / drop expiring!
+    const activeMagnet = player.powerups.magnet > 0 || this.type === 'overdrive' || this.life < 4.0;
+    const range = activeMagnet ? 3000 : Math.max(220, player.pickupRadius * 1.6);
 
     if (dist < range) {
-      // Magnetic steering forces (accelerates towards player)
-      const pullSpeed = activeMagnet ? 900 : 550;
+      // Accelerating magnetic pull speed (faster as it gets closer)
+      const speedFactor = Math.max(0.2, 1 - dist / range);
+      const pullSpeed = activeMagnet ? 1000 : (550 + speedFactor * 800);
+      
       const dirX = dx / dist;
       const dirY = dy / dist;
       
-      // Interpolate coordinates towards player position
+      // Pull coordinates towards player car
       this.x += dirX * pullSpeed * dt;
       this.y += dirY * pullSpeed * dt;
 
-      // Spawn faint particle trails
-      if (Math.random() < 0.2 && this.game.saveData.settings.particlesQuality !== 'low') {
+      // Spawn subtle particle trails
+      if (Math.random() < 0.25 && this.game.saveData.settings.particlesQuality !== 'low') {
         this.game.particles.spawnParticle({
           x: this.x, y: this.y,
-          vx: -dirX * 50, vy: -dirY * 50,
+          vx: -dirX * 60, vy: -dirY * 60,
           color: this.getColor(),
-          size: 1.5, life: 0.25, glow: false
+          size: 1.8, life: 0.25, glow: true
         });
       }
     }
 
     // Collect range trigger
-    if (dist < player.radius + this.radius) {
+    if (dist < player.radius + this.radius + 10) {
       this.collect(player);
     }
   }

@@ -57,6 +57,18 @@ export class Game {
     
     // Bind DOM events
     this.bindUIEvents();
+
+    // Register weapon cycle and select callbacks for in-game swapping
+    this.input.onWeaponCycleRequest = (dir) => {
+      if (this.state === 'PLAYING' && this.player) {
+        this.player.cycleWeapon(dir);
+      }
+    };
+    this.input.onWeaponSelectRequest = (idx) => {
+      if (this.state === 'PLAYING' && this.player) {
+        this.player.selectWeaponIndex(idx);
+      }
+    };
     
     // Set initial volumes
     this.audio.volumes.master = this.saveData.settings.masterVolume;
@@ -797,6 +809,9 @@ export class Game {
     // Render HUD Minimap (radar) on top of screen
     this.renderMinimap();
     
+    // Render off-screen directional tracking arrows (Bosses & Stations)
+    this.renderOffscreenPointers();
+
     // Draw touch controls in screen-space if active
     if (this.input.touchActive) {
       this.renderTouchControls();
@@ -806,6 +821,92 @@ export class Game {
     if (this.debugMode) {
       this.renderFpsTracker();
     }
+  }
+
+  renderOffscreenPointers() {
+    if (!this.player || this.state !== 'PLAYING') return;
+
+    const margin = 38;
+    const screenW = this.canvas.width;
+    const screenH = this.canvas.height;
+    const centerX = screenW / 2;
+    const centerY = screenH / 2;
+
+    const targets = [];
+
+    // 1. Track Active Bosses
+    for (let e of this.enemies) {
+      if (e.isDead) continue;
+      if (e.type === 'titan' || e.type === 'void_racer' || e.type === 'omega_core' || e.type.includes('boss')) {
+        targets.push({ x: e.x, y: e.y, label: '👹 BOSS', color: 'var(--neon-magenta)' });
+      }
+    }
+
+    // 2. Track Health / Charge Stations
+    for (let st of this.arena.stations) {
+      const stCenterX = st.x + st.width / 2;
+      const stCenterY = st.y + st.height / 2;
+      const isHealth = st.type === 'health';
+      targets.push({
+        x: stCenterX,
+        y: stCenterY,
+        label: isHealth ? '✚ REPAIR' : '⚡ CHARGE',
+        color: isHealth ? 'var(--neon-green)' : 'var(--neon-yellow)'
+      });
+    }
+
+    targets.forEach(t => {
+      const screenPos = this.camera.worldToScreen(t.x, t.y);
+
+      // Check if target is outside screen viewport
+      const isOffscreen = screenPos.x < 30 || screenPos.x > screenW - 30 ||
+                          screenPos.y < 30 || screenPos.y > screenH - 30;
+
+      if (!isOffscreen) return;
+
+      const angle = Math.atan2(screenPos.y - centerY, screenPos.x - centerX);
+
+      // Clamp pointer position to screen boundary margin
+      const edgeX = Math.max(margin, Math.min(screenW - margin, centerX + Math.cos(angle) * (centerX - margin)));
+      const edgeY = Math.max(margin, Math.min(screenH - margin, centerY + Math.sin(angle) * (centerY - margin)));
+
+      const distMeters = Math.round(Math.hypot(t.x - this.player.x, t.y - this.player.y) / 10);
+
+      this.ctx.save();
+      this.ctx.translate(edgeX, edgeY);
+
+      const resolvedCol = resolveColor(t.color);
+      this.ctx.fillStyle = resolvedCol;
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 1.5;
+
+      const isGlow = this.saveData.settings.glowEnabled;
+      this.ctx.shadowBlur = isGlow ? 10 : 0;
+      this.ctx.shadowColor = resolvedCol;
+
+      // Draw arrow pointer
+      this.ctx.save();
+      this.ctx.rotate(angle);
+      this.ctx.beginPath();
+      this.ctx.moveTo(14, 0);
+      this.ctx.lineTo(-8, -7);
+      this.ctx.lineTo(-3, 0);
+      this.ctx.lineTo(-8, 7);
+      this.ctx.closePath();
+      this.ctx.fill();
+      this.ctx.stroke();
+      this.ctx.restore();
+
+      // Text label and distance
+      this.ctx.shadowBlur = 0;
+      this.ctx.font = 'bold 10px Share Tech Mono';
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+      const textOffsetY = Math.sin(angle) > 0 ? -16 : 16;
+      this.ctx.fillText(`${t.label} (${distMeters}m)`, 0, textOffsetY);
+
+      this.ctx.restore();
+    });
   }
 
   renderMinimap() {
@@ -1009,7 +1110,7 @@ export class Game {
 
     // 2. BOOST Touch Button (🚀)
     const tbx = rect.width - 85;
-    const tby = rect.height - 175;
+    const tby = rect.height - 170;
     
     this.ctx.strokeStyle = this.input.boostBtn.active ? 'var(--neon-yellow)' : 'rgba(255, 204, 0, 0.4)';
     this.ctx.fillStyle = this.input.boostBtn.active ? 'rgba(255, 204, 0, 0.3)' : 'rgba(4, 6, 18, 0.5)';
@@ -1018,12 +1119,31 @@ export class Game {
     this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.boostBtn.active) ? 14 : 0;
     
     this.ctx.beginPath();
-    this.ctx.arc(tbx, tby, 30, 0, Math.PI * 2);
+    this.ctx.arc(tbx, tby, 28, 0, Math.PI * 2);
     this.ctx.fill();
     this.ctx.stroke();
     
     this.ctx.fillStyle = '#ffffff';
     this.ctx.fillText("🚀 BOOST", tbx, tby);
+
+    // 3. WEAPON SWAP Touch Button (🔄)
+    const swx = rect.width - 85;
+    const swy = rect.height - 245;
+
+    this.ctx.strokeStyle = this.input.swapBtn.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.4)';
+    this.ctx.fillStyle = this.input.swapBtn.active ? 'rgba(0, 243, 255, 0.3)' : 'rgba(4, 6, 18, 0.5)';
+    this.ctx.lineWidth = 2.5;
+    this.ctx.shadowColor = 'var(--neon-cyan)';
+    this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.swapBtn.active) ? 12 : 0;
+
+    this.ctx.beginPath();
+    this.ctx.arc(swx, swy, 25, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.stroke();
+
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = 'bold 10px Orbitron';
+    this.ctx.fillText("🔄 SWAP", swx, swy);
     
     this.ctx.restore();
   }

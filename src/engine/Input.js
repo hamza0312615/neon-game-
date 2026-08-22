@@ -9,6 +9,7 @@ export class Input {
     this.joystick = { active: false, startX: 0, startY: 0, curX: 0, curY: 0, vx: 0, vy: 0 };
     this.shootBtn = { active: false };
     this.boostBtn = { active: false };
+    this.swapBtn = { active: false };
 
     this.setupListeners();
   }
@@ -16,8 +17,19 @@ export class Input {
   setupListeners() {
     // Keyboard
     window.addEventListener('keydown', (e) => {
-      this.keys[e.key.toLowerCase()] = true;
-      this.keys[e.code] = true; // Support alternative mapping codes e.g. ArrowUp, ShiftLeft
+      const key = e.key.toLowerCase();
+      this.keys[key] = true;
+      this.keys[e.code] = true;
+
+      // Quick weapon swap triggers
+      if (this.onWeaponCycleRequest) {
+        if (key === 'q') this.onWeaponCycleRequest(-1);
+        if (key === 'e') this.onWeaponCycleRequest(1);
+        if (key >= '1' && key <= '6') {
+          const idx = parseInt(key) - 1;
+          this.onWeaponSelectRequest(idx);
+        }
+      }
     });
 
     window.addEventListener('keyup', (e) => {
@@ -25,14 +37,19 @@ export class Input {
       this.keys[e.code] = false;
     });
 
+    // Mouse wheel scroll to cycle weapons
+    window.addEventListener('wheel', (e) => {
+      if (this.onWeaponCycleRequest) {
+        const dir = e.deltaY > 0 ? 1 : -1;
+        this.onWeaponCycleRequest(dir);
+      }
+    }, { passive: true });
+
     // Mouse Movement
     window.addEventListener('mousemove', (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      // Screen space mouse
       this.mouse.screenX = e.clientX - rect.left;
       this.mouse.screenY = e.clientY - rect.top;
-      
-      // Calculate normalized relative position from center of canvas
       this.mouse.x = this.mouse.screenX;
       this.mouse.y = this.mouse.screenY;
     });
@@ -60,7 +77,7 @@ export class Input {
         const tx = touch.clientX - rect.left;
         const ty = touch.clientY - rect.top;
 
-        // If left side of screen, initialize virtual movement joystick
+        // Left half: Virtual Movement Joystick
         if (tx < rect.width / 2 && !this.joystick.active) {
           this.joystick.active = true;
           this.joystick.startX = tx;
@@ -70,11 +87,14 @@ export class Input {
           this.joystick.vx = 0;
           this.joystick.vy = 0;
         } else if (tx >= rect.width / 2) {
-          // Right side handles firing / boost touch regions
-          if (ty > rect.height * 0.6) {
+          // Right half: Touch action regions
+          if (ty > rect.height * 0.65) {
             this.shootBtn.active = true;
-          } else {
+          } else if (ty > rect.height * 0.35) {
             this.boostBtn.active = true;
+          } else {
+            this.swapBtn.active = true;
+            if (this.onWeaponCycleRequest) this.onWeaponCycleRequest(1);
           }
         }
       }
@@ -92,11 +112,10 @@ export class Input {
           this.joystick.curX = tx;
           this.joystick.curY = ty;
           
-          // Calculate joystick vector
           const dx = this.joystick.curX - this.joystick.startX;
           const dy = this.joystick.curY - this.joystick.startY;
           const dist = Math.hypot(dx, dy);
-          const maxDist = 60; // Max joystick radius
+          const maxDist = 60;
           
           if (dist === 0) {
             this.joystick.vx = 0;
@@ -108,7 +127,6 @@ export class Input {
             this.joystick.vy = Math.sin(angle) * intensity;
           }
         } else if (tx >= rect.width / 2) {
-          // Set aiming vector towards touch point on right half of screen
           this.mouse.screenX = tx;
           this.mouse.screenY = ty;
           this.mouse.x = tx;
@@ -131,6 +149,7 @@ export class Input {
         } else if (tx >= rect.width / 2) {
           this.shootBtn.active = false;
           this.boostBtn.active = false;
+          this.swapBtn.active = false;
         }
       }
       if (e.touches.length === 0) {
