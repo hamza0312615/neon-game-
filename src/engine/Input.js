@@ -2,8 +2,8 @@ export class Input {
   constructor(canvas) {
     this.canvas = canvas;
     this.keys = {};
-    this.mouse = { x: 0, y: 0, screenX: 0, screenY: 0, isDown: false };
-    
+    this.mouse = { x: 0, y: 0, screenX: 0, screenY: 0, isDown: false, rightDown: false };
+
     // Touch controls (virtual joystick)
     this.touchActive = false;
     this.joystick = { active: false, startX: 0, startY: 0, curX: 0, curY: 0, vx: 0, vy: 0 };
@@ -64,10 +64,12 @@ export class Input {
     // Mouse Clicks
     window.addEventListener('mousedown', (e) => {
       if (e.button === 0) this.mouse.isDown = true;
+      if (e.button === 2) this.mouse.rightDown = true;
     });
 
     window.addEventListener('mouseup', (e) => {
       if (e.button === 0) this.mouse.isDown = false;
+      if (e.button === 2) this.mouse.rightDown = false;
     });
 
     // Prevent right click menu in game area
@@ -166,28 +168,63 @@ export class Input {
   }
 
   // Helper getters to unify input source (keyboard or virtual touch)
+  updateGamepad() {
+    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+    this.gamepadState = { accelerating: false, reversing: false, turningLeft: false, turningRight: false, shooting: false, boosting: false };
+
+    if (!gamepads) return;
+    
+    for (let i = 0; i < gamepads.length; i++) {
+      const gp = gamepads[i];
+      if (!gp || !gp.connected) continue;
+
+      const axisX = gp.axes[0] || 0;
+      const axisY = gp.axes[1] || 0;
+      const deadzone = 0.22;
+
+      this.gamepadState.accelerating = axisY < -deadzone || !!gp.buttons[12]?.pressed;
+      this.gamepadState.reversing = axisY > deadzone || !!gp.buttons[13]?.pressed;
+      this.gamepadState.turningLeft = axisX < -deadzone || !!gp.buttons[14]?.pressed;
+      this.gamepadState.turningRight = axisX > deadzone || !!gp.buttons[15]?.pressed;
+      this.gamepadState.shooting = !!gp.buttons[0]?.pressed || (gp.buttons[7]?.value || 0) > 0.3;
+      this.gamepadState.boosting = !!gp.buttons[1]?.pressed || (gp.buttons[6]?.value || 0) > 0.3;
+
+      if (gp.buttons[4]?.pressed && !this.lastGpLB) {
+        if (this.onWeaponCycleRequest) this.onWeaponCycleRequest(-1);
+      }
+      if (gp.buttons[5]?.pressed && !this.lastGpRB) {
+        if (this.onWeaponCycleRequest) this.onWeaponCycleRequest(1);
+      }
+      this.lastGpLB = !!gp.buttons[4]?.pressed;
+      this.lastGpRB = !!gp.buttons[5]?.pressed;
+
+      break;
+    }
+  }
+
   isAccelerating() {
-    return !!(this.keys['w'] || this.keys['KeyW'] || this.keys['keyw'] || this.keys['arrowup'] || this.keys['ArrowUp'] || (this.joystick.active && this.joystick.vy < -0.2));
+    this.updateGamepad();
+    return !!(this.keys['w'] || this.keys['W'] || this.keys['KeyW'] || this.keys['keyw'] || this.keys['arrowup'] || this.keys['ArrowUp'] || (this.joystick.active && this.joystick.vy < -0.2) || this.gamepadState.accelerating);
   }
 
   isReversing() {
-    return !!(this.keys['s'] || this.keys['KeyS'] || this.keys['keys'] || this.keys['arrowdown'] || this.keys['ArrowDown'] || (this.joystick.active && this.joystick.vy > 0.2));
+    return !!(this.keys['s'] || this.keys['S'] || this.keys['KeyS'] || this.keys['keys'] || this.keys['arrowdown'] || this.keys['ArrowDown'] || (this.joystick.active && this.joystick.vy > 0.2) || this.gamepadState.reversing);
   }
 
   isTurningLeft() {
-    return !!(this.keys['a'] || this.keys['KeyA'] || this.keys['keya'] || this.keys['arrowleft'] || this.keys['ArrowLeft'] || (this.joystick.active && this.joystick.vx < -0.2));
+    return !!(this.keys['a'] || this.keys['KeyA'] || this.keys['keya'] || this.keys['arrowleft'] || this.keys['ArrowLeft'] || (this.joystick.active && this.joystick.vx < -0.2) || this.gamepadState.turningLeft);
   }
 
   isTurningRight() {
-    return !!(this.keys['d'] || this.keys['KeyD'] || this.keys['keyd'] || this.keys['arrowright'] || this.keys['ArrowRight'] || (this.joystick.active && this.joystick.vx > 0.2));
+    return !!(this.keys['d'] || this.keys['KeyD'] || this.keys['keyd'] || this.keys['arrowright'] || this.keys['ArrowRight'] || (this.joystick.active && this.joystick.vx > 0.2) || this.gamepadState.turningRight);
   }
 
   isShooting() {
-    return !!(this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.keys['Space'] || this.shootBtn.active);
+    return !!(this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.keys['Space'] || this.shootBtn.active || this.gamepadState.shooting);
   }
 
   isBoosting() {
-    return !!(this.keys['shift'] || this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.keys['shiftleft'] || this.keys['shiftright'] || this.boostBtn.active);
+    return !!(this.keys['shift'] || this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.keys['shiftleft'] || this.keys['shiftright'] || this.boostBtn.active || this.gamepadState.boosting);
   }
 
   isPausePressed() {

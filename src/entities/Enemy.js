@@ -449,7 +449,7 @@ export class Tank extends Enemy {
     ctx.strokeRect(-28, 17, 56, 5);
 
     // Front Ramming Bumper
-    ctx.fillStyle = 'var(--neon-purple)';
+    ctx.fillStyle = resolveColor('var(--neon-purple)');
     ctx.fillRect(20, -12, 6, 24);
 
     // Heavy Central Rotating Core Dome
@@ -581,8 +581,8 @@ export class Sniper extends Enemy {
     if (this.isCharging && !this.isStunned()) {
       // Draw warning aim laser line
       ctx.save();
-      ctx.strokeStyle = `rgba(255, 0, 68, ${0.1 + (Math.sin(Date.now() * 0.05) * 0.05 + 0.1) * (1 - this.chargeTimer/this.chargeDuration)})`;
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = `rgba(255, 0, 68, ${0.3 + (Math.sin(Date.now() * 0.1) * 0.25 + 0.25) * (1 - this.chargeTimer/this.chargeDuration)})`;
+      ctx.lineWidth = 2.0;
       ctx.setLineDash([6, 6]);
       ctx.beginPath();
       ctx.moveTo(this.x, this.y);
@@ -592,7 +592,7 @@ export class Sniper extends Enemy {
       // Target dot at end
       ctx.fillStyle = resolveColor('var(--neon-red)');
       ctx.beginPath();
-      ctx.arc(this.lockX, this.lockY, 3, 0, Math.PI*2);
+      ctx.arc(this.lockX, this.lockY, 5, 0, Math.PI*2);
       ctx.fill();
       ctx.restore();
     }
@@ -704,7 +704,7 @@ export class Striker extends Enemy {
 
     // Cyan Thruster Flame
     if (this.isDashing) {
-      ctx.fillStyle = 'var(--neon-cyan)';
+      ctx.fillStyle = resolveColor('var(--neon-cyan)');
       ctx.fillRect(-22, -4, 10, 8);
     }
   }
@@ -783,7 +783,7 @@ export class Drone extends Enemy {
     const offsets = [ {x:-14, y:-14}, {x:14, y:-14}, {x:14, y:14}, {x:-14, y:14} ];
     const spinAngle = Date.now() * 0.025;
 
-    ctx.strokeStyle = 'var(--neon-green)';
+    ctx.strokeStyle = resolveColor('var(--neon-green)');
     ctx.lineWidth = 1.5;
     
     offsets.forEach(o => {
@@ -855,7 +855,7 @@ export class Kamikaze extends Enemy {
       this.fuseTimer -= dt;
       
       // detonate flashing colors rapidly
-      this.color = Math.floor(Date.now() / 60) % 2 === 0 ? '#fff' : 'var(--neon-red)';
+      this.color = Math.floor(Date.now() / 60) % 2 === 0 ? '#ffffff' : resolveColor('var(--neon-red)');
       
       if (this.fuseTimer <= 0) {
         this.detonate();

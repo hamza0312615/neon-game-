@@ -42,7 +42,7 @@ export class WaveManager {
     let subMsg = "PREPARE FOR CONTACT";
     
     // 1. Core wave compositions
-    const scale = 1.0 + (this.waveNumber - 1) * 0.18; // Increased scaling from 12% to 18% for higher difficulty
+    const scale = 1.0 + (this.waveNumber - 1) * 0.12; // Rebalanced scaling curve (12% per wave)
     
     if (this.waveNumber === 10) {
       alertTitle.innerText = "BOSS WAVE 10";
@@ -90,13 +90,13 @@ export class WaveManager {
     this.spawnInterval = Math.max(0.4, 1.5 - this.waveNumber * 0.05); // spawn faster on higher waves
 
     // Display alert UI panel
-    alertSub.innerText = subMsg;
-    alertTitle.classList.remove('hidden');
-    alertSub.classList.remove('hidden');
+    if (alertSub) alertSub.innerText = subMsg;
+    alertTitle?.classList.remove('hidden');
+    alertSub?.classList.remove('hidden');
     
     setTimeout(() => {
-      alertTitle.classList.add('hidden');
-      alertSub.classList.add('hidden');
+      alertTitle?.classList.add('hidden');
+      alertSub?.classList.add('hidden');
     }, 2500);
 
     // 2. Random Event trigger (chance of happening starting on wave 2, except boss waves)
@@ -113,7 +113,7 @@ export class WaveManager {
     this.eventTimer = selected === 'power_surge' || selected === 'blackout' ? 15.0 : 0;
 
     const alertSub = document.getElementById('hud-sub-alert');
-    alertSub.classList.remove('hidden');
+    alertSub?.classList.remove('hidden');
 
     if (selected === 'supply_drop') {
       alertSub.innerText = "CRITICAL RESOURCE CACHE INCOMING";
@@ -287,7 +287,7 @@ export class WaveManager {
 
   spawnBossNow() {
     this.waveActive = true;
-    const scale = 1.0 + (this.waveNumber - 1) * 0.18;
+    const scale = 1.0 + (this.waveNumber - 1) * 0.12;
     const bosses = ['titan', 'void_racer', 'omega_core'];
     const chosen = bosses[Math.floor(Math.random() * bosses.length)];
     

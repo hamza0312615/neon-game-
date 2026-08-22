@@ -11,11 +11,17 @@ export class SaveSystem {
         particlesQuality: 'high',
         shakeEnabled: true,
         damageNumbersEnabled: true,
+        colorblindMode: false,
+        photosensitiveMode: false
       },
       progression: {
         bestScore: 0,
         highestWave: 1,
         credits: 0,
+        completedTutorial: false,
+        firstLaunch: true,
+        dailyStreak: 1,
+        lastLoginDate: new Date().toISOString().slice(0, 10),
         unlockedWeapons: ['plasma'],
         activeWeapon: 'plasma',
         upgrades: {
@@ -25,7 +31,7 @@ export class SaveSystem {
           weapon: 1,      // Bullet damage, fire rate
           handling: 1,    // Turning speed, drift grip
           boost: 1,       // Capacity, recharge speed
-          utility: 1,     // Pickup range, XP gain bonus
+          utility: 1      // Pickup range, XP gain bonus
         }
       },
       statistics: {
@@ -45,20 +51,19 @@ export class SaveSystem {
       }
       
       const parsed = JSON.parse(dataStr);
-      // Merge with defaults to ensure missing properties from updates don't crash
       const defaults = this.getDefaults();
       
       return {
-        settings: { ...defaults.settings, ...parsed.settings },
+        settings: { ...defaults.settings, ...(parsed.settings || {}) },
         progression: {
           ...defaults.progression,
-          ...parsed.progression,
+          ...(parsed.progression || {}),
           upgrades: { ...defaults.progression.upgrades, ...(parsed.progression?.upgrades || {}) }
         },
-        statistics: { ...defaults.statistics, ...parsed.statistics }
+        statistics: { ...defaults.statistics, ...(parsed.statistics || {}) }
       };
     } catch (e) {
-      console.error("Failed to load save data. Resetting to defaults.", e);
+      console.error("Failed to load save data. Resetting to defaults safely.", e);
       return this.getDefaults();
     }
   }

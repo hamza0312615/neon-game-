@@ -142,13 +142,15 @@ export class Game {
       this.saveData.settings.particlesQuality = document.getElementById('setting-particles').value;
       this.saveData.settings.shakeEnabled = document.getElementById('setting-shake').checked;
       this.saveData.settings.damageNumbersEnabled = document.getElementById('setting-damage-nums').checked;
+      this.saveData.settings.colorblindMode = document.getElementById('setting-colorblind')?.checked ?? false;
+      this.saveData.settings.photosensitiveMode = document.getElementById('setting-photosensitive')?.checked ?? false;
 
       this.audio.setVolumes(
         this.saveData.settings.masterVolume,
         this.saveData.settings.musicVolume,
         this.saveData.settings.sfxVolume
       );
-      this.camera.enabledShake = this.saveData.settings.shakeEnabled;
+      this.camera.enabledShake = this.saveData.settings.shakeEnabled && !this.saveData.settings.photosensitiveMode;
       
       SaveSystem.save(this.saveData);
 
@@ -165,8 +167,14 @@ export class Game {
 
     // Game Over Buttons
     bindBtn('btn-gameover-retry', () => this.startGame());
+    bindBtn('btn-gameover-share', () => this.generateShareCard());
     bindBtn('btn-gameover-garage', () => this.changeState('GARAGE'));
     bindBtn('btn-gameover-menu', () => this.changeState('MENU'));
+
+    // Victory Buttons
+    bindBtn('btn-victory-share', () => this.generateShareCard());
+    bindBtn('btn-victory-garage', () => this.changeState('GARAGE'));
+    bindBtn('btn-victory-menu', () => this.changeState('MENU'));
 
     // Boss Summoning listeners (Click Wave title or press 'B')
     bindBtn('hud-wave-title', () => {
@@ -178,10 +186,6 @@ export class Game {
         this.waveManager.spawnBossNow();
       }
     });
-
-    // Victory Buttons
-    bindBtn('btn-victory-garage', () => this.changeState('GARAGE'));
-    bindBtn('btn-victory-menu', () => this.changeState('MENU'));
 
     // Skip Tutorial Overlay
     bindBtn('btn-skip-tut', () => {
@@ -206,6 +210,62 @@ export class Game {
         console.log(`Developer Debug Mode: ${this.debugMode ? 'ENABLED' : 'DISABLED'}`);
       }
     });
+  }
+
+  generateShareCard() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 640;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+
+    const bg = ctx.createLinearGradient(0, 0, 640, 400);
+    bg.addColorStop(0, '#0a0e1f');
+    bg.addColorStop(1, '#05060f');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, 640, 400);
+
+    const cyan = resolveColor('var(--neon-cyan)');
+    ctx.strokeStyle = cyan;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(15, 15, 610, 370);
+
+    ctx.fillStyle = cyan;
+    ctx.font = '900 26px Orbitron';
+    ctx.fillText('⚡ NEON CIRCUIT COMBAT CARD', 40, 55);
+
+    ctx.fillStyle = '#8a99ad';
+    ctx.font = '14px Share Tech Mono';
+    ctx.fillText('TACTICAL TELEMETRY EXPORT', 40, 78);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px Share Tech Mono';
+    ctx.fillText(`🏆 FINAL SCORE: ${this.score.toLocaleString()}`, 40, 140);
+    ctx.fillText(`🌊 WAVES SURVIVED: ${this.waveManager.waveNumber}`, 40, 175);
+    ctx.fillText(`👾 HOSTILES DESTROYED: ${this.kills}`, 40, 210);
+    ctx.fillText(`⚡ BEST COMBO: ×${this.bestCombo}`, 40, 245);
+    ctx.fillText(`🪙 CREDITS SALVAGED: ${this.creditsEarned.toLocaleString()}`, 40, 280);
+
+    ctx.save();
+    ctx.translate(480, 210);
+    ctx.strokeStyle = cyan;
+    ctx.lineWidth = 2;
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.15)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 70, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = cyan;
+    ctx.font = 'bold 14px Orbitron';
+    ctx.textAlign = 'center';
+    ctx.fillText('SUPERCAR', 0, 95);
+    ctx.restore();
+
+    const link = document.createElement('a');
+    link.download = `neon_circuit_score_wave${this.waveManager.waveNumber}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    this.audio.playPickup();
   }
 
   buyUpgrade(category) {
@@ -357,6 +417,10 @@ export class Game {
     this.bestCombo = 1;
     this.waveManager.reset();
     
+    // Capture window focus and canvas focus
+    window.focus();
+    if (this.canvas) this.canvas.focus();
+
     this.changeState('PLAYING');
     
     // Start soundtrack
@@ -831,6 +895,78 @@ export class Game {
     if (this.debugMode) {
       this.renderFpsTracker();
     }
+
+    if (this.state === 'MENU') {
+      this.renderMenuShowcaseCar();
+    }
+  }
+
+  renderMenuShowcaseCar() {
+    const cvs = document.getElementById('menu-car-canvas');
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    const w = cvs.width;
+    const h = cvs.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.translate(w / 2, h / 2);
+
+    const angle = Date.now() * 0.0012;
+    ctx.rotate(angle);
+
+    const cyanCol = resolveColor('var(--neon-cyan)');
+    const yellowCol = resolveColor('var(--neon-yellow)');
+
+    const aura = ctx.createRadialGradient(0, 0, 10, 0, 0, 55);
+    aura.addColorStop(0, 'rgba(0, 229, 255, 0.45)');
+    aura.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = aura;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 55, 35, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#080c1a';
+    ctx.strokeStyle = cyanCol;
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(32, 0);
+    ctx.lineTo(14, -14);
+    ctx.lineTo(-20, -16);
+    ctx.lineTo(-28, -6);
+    ctx.lineTo(-24, 0);
+    ctx.lineTo(-28, 6);
+    ctx.lineTo(-20, 16);
+    ctx.lineTo(14, 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
+    ctx.beginPath();
+    ctx.ellipse(2, 0, 12, 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    const wheels = [
+      { x: 14, y: -15 }, { x: 14, y: 15 },
+      { x: -16, y: -15 }, { x: -16, y: 15 }
+    ];
+    ctx.fillStyle = '#05070e';
+    ctx.strokeStyle = cyanCol;
+    ctx.lineWidth = 1.5;
+
+    wheels.forEach(wh => {
+      ctx.fillRect(wh.x - 6, wh.y - 3, 12, 6);
+      ctx.strokeRect(wh.x - 6, wh.y - 3, 12, 6);
+    });
+
+    ctx.fillStyle = yellowCol;
+    ctx.fillRect(6, -6, 12, 3);
+    ctx.fillRect(6, 3, 12, 3);
+
+    ctx.restore();
   }
 
   renderOffscreenPointers() {
@@ -964,7 +1100,7 @@ export class Game {
     }
 
     // Draw Enemies
-    this.ctx.fillStyle = 'var(--neon-red)';
+    this.ctx.fillStyle = resolveColor('var(--neon-red)');
     for (let e of this.enemies) {
       this.ctx.beginPath();
       this.ctx.arc(e.x * mapScale, e.y * mapScale, 2, 0, Math.PI*2);
@@ -973,7 +1109,7 @@ export class Game {
 
     // Draw Player (flashing Cyan dot)
     if (this.player) {
-      this.ctx.fillStyle = (Date.now() % 400 < 200) ? 'var(--neon-cyan)' : '#fff';
+      this.ctx.fillStyle = (Date.now() % 400 < 200) ? resolveColor('var(--neon-cyan)') : '#ffffff';
       this.ctx.beginPath();
       this.ctx.arc(this.player.x * mapScale, this.player.y * mapScale, 3, 0, Math.PI*2);
       this.ctx.fill();
@@ -996,7 +1132,7 @@ export class Game {
     this.ctx.fillRect(this.player.x - this.player.radius, this.player.y - this.player.radius, this.player.radius*2, this.player.radius*2);
 
     // Velocity Vector
-    this.ctx.strokeStyle = 'var(--neon-cyan)';
+    this.ctx.strokeStyle = resolveColor('var(--neon-cyan)');
     this.ctx.beginPath();
     this.ctx.moveTo(this.player.x, this.player.y);
     this.ctx.lineTo(this.player.x + this.player.vx * 20, this.player.y + this.player.vy * 20);
@@ -1023,7 +1159,7 @@ export class Game {
       }
       
       // Draw velocity vector
-      this.ctx.strokeStyle = 'var(--neon-yellow)';
+      this.ctx.strokeStyle = resolveColor('var(--neon-yellow)');
       this.ctx.beginPath();
       this.ctx.moveTo(e.x, e.y);
       this.ctx.lineTo(e.x + (e.vx || 0) * 15, e.y + (e.vy || 0) * 15);
@@ -1038,7 +1174,7 @@ export class Game {
 
     // 3. Draw Obstacles collision boxes
     for (let o of this.arena.obstacles) {
-      this.ctx.strokeStyle = 'var(--neon-yellow)';
+      this.ctx.strokeStyle = resolveColor('var(--neon-yellow)');
       this.ctx.strokeRect(o.x, o.y, o.width, o.height);
     }
   }
@@ -1046,7 +1182,7 @@ export class Game {
   renderFpsTracker() {
     this.ctx.save();
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    this.ctx.strokeStyle = 'var(--neon-cyan)';
+    this.ctx.strokeStyle = resolveColor('var(--neon-cyan)');
     this.ctx.lineWidth = 1;
     this.ctx.fillRect(10, this.canvas.height - 120, 200, 110);
     this.ctx.strokeRect(10, this.canvas.height - 120, 200, 110);
@@ -1076,11 +1212,15 @@ export class Game {
     const curX = j.active ? j.curX : jx;
     const curY = j.active ? j.curY : jy;
 
+    const cyanCol = resolveColor('var(--neon-cyan)');
+    const greenCol = resolveColor('var(--neon-green)');
+    const yellowCol = resolveColor('var(--neon-yellow)');
+
     // Outer base ring
-    this.ctx.strokeStyle = j.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.35)';
+    this.ctx.strokeStyle = j.active ? cyanCol : 'rgba(0, 243, 255, 0.35)';
     this.ctx.fillStyle = j.active ? 'rgba(0, 243, 255, 0.12)' : 'rgba(4, 6, 18, 0.4)';
     this.ctx.lineWidth = 2.5;
-    this.ctx.shadowColor = 'var(--neon-cyan)';
+    this.ctx.shadowColor = cyanCol;
     this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && j.active) ? 12 : 0;
     
     this.ctx.beginPath();
@@ -1089,7 +1229,7 @@ export class Game {
     this.ctx.stroke();
     
     // Inner handle knob
-    this.ctx.fillStyle = j.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.5)';
+    this.ctx.fillStyle = j.active ? cyanCol : 'rgba(0, 243, 255, 0.5)';
     this.ctx.beginPath();
     this.ctx.arc(curX, curY, handleR, 0, Math.PI * 2);
     this.ctx.fill();
@@ -1100,10 +1240,10 @@ export class Game {
     const by = rect.height - 85;
     
     // 1. FIRE Touch Button (💥)
-    this.ctx.strokeStyle = this.input.shootBtn.active ? 'var(--neon-green)' : 'rgba(0, 255, 136, 0.4)';
+    this.ctx.strokeStyle = this.input.shootBtn.active ? greenCol : 'rgba(0, 255, 136, 0.4)';
     this.ctx.fillStyle = this.input.shootBtn.active ? 'rgba(0, 255, 136, 0.3)' : 'rgba(4, 6, 18, 0.5)';
     this.ctx.lineWidth = 3;
-    this.ctx.shadowColor = 'var(--neon-green)';
+    this.ctx.shadowColor = greenCol;
     this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.shootBtn.active) ? 14 : 0;
     
     this.ctx.beginPath();
@@ -1122,10 +1262,10 @@ export class Game {
     const tbx = rect.width - 85;
     const tby = rect.height - 170;
     
-    this.ctx.strokeStyle = this.input.boostBtn.active ? 'var(--neon-yellow)' : 'rgba(255, 204, 0, 0.4)';
+    this.ctx.strokeStyle = this.input.boostBtn.active ? yellowCol : 'rgba(255, 204, 0, 0.4)';
     this.ctx.fillStyle = this.input.boostBtn.active ? 'rgba(255, 204, 0, 0.3)' : 'rgba(4, 6, 18, 0.5)';
     this.ctx.lineWidth = 3;
-    this.ctx.shadowColor = 'var(--neon-yellow)';
+    this.ctx.shadowColor = yellowCol;
     this.ctx.shadowBlur = (this.saveData.settings.glowEnabled && this.input.boostBtn.active) ? 14 : 0;
     
     this.ctx.beginPath();
@@ -1140,7 +1280,10 @@ export class Game {
     const swx = rect.width - 85;
     const swy = rect.height - 245;
 
-    this.ctx.strokeStyle = this.input.swapBtn.active ? 'var(--neon-cyan)' : 'rgba(0, 243, 255, 0.4)';
+    this.ctx.strokeStyle = this.input.swapBtn.active ? cyanCol : 'rgba(0, 243, 255, 0.4)';
+    this.ctx.fillStyle = this.input.swapBtn.active ? 'rgba(0, 243, 255, 0.3)' : 'rgba(4, 6, 18, 0.5)';
+    this.ctx.lineWidth = 2.5;
+    this.ctx.shadowColor = cyanCol;
     this.ctx.fillStyle = this.input.swapBtn.active ? 'rgba(0, 243, 255, 0.3)' : 'rgba(4, 6, 18, 0.5)';
     this.ctx.lineWidth = 2.5;
     this.ctx.shadowColor = 'var(--neon-cyan)';

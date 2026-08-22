@@ -350,25 +350,45 @@ export class Player {
       this.maxSpeed = (this.isBoosting ? this.baseMaxSpeed * 1.5 : this.baseMaxSpeed) * this.speedMultiplier;
     }
 
-    // 6. 2D VEHICLE PHYSICS & MOVEMENT
-    // Steering controls (rotates chassis angle)
-    if (input.isTurningLeft()) {
+    // 6. SMART HYBRID VEHICLE PHYSICS & MOVEMENT
+    const isTurningLeft = input.isTurningLeft();
+    const isTurningRight = input.isTurningRight();
+    const isAccelerating = input.isAccelerating();
+    const isReversing = input.isReversing();
+    const isMouseDrive = input.mouse.rightDown;
+
+    if (isTurningLeft) {
       this.angle -= this.turnSpeed * dt;
       if (this.tutorialActive) this.game.advanceTutorial(0);
     }
-    if (input.isTurningRight()) {
+    if (isTurningRight) {
       this.angle += this.turnSpeed * dt;
       if (this.tutorialActive) this.game.advanceTutorial(0);
     }
 
-    // Acceleration & Braking inputs
+    // Acceleration & Throttle logic (Guarantees instant movement on ANY input)
     let throttle = 0;
-    if (input.isAccelerating()) {
+    if (isAccelerating) {
       throttle = 1.0;
       if (this.tutorialActive) this.game.advanceTutorial(0);
-    } else if (input.isReversing()) {
-      throttle = -1.0; // faster braking / reverse speed
+    } else if (isReversing) {
+      throttle = -1.0;
       if (this.tutorialActive) this.game.advanceTutorial(0);
+    } else if (isTurningLeft || isTurningRight) {
+      // Steering automatically provides forward drive force so car never freezes!
+      throttle = 0.85;
+      if (this.tutorialActive) this.game.advanceTutorial(0);
+    } else if (isMouseDrive) {
+      // Steer & Drive towards mouse position on Right-Click
+      const mouseWorld = this.game.camera.screenToWorld(input.mouse.x, input.mouse.y);
+      const targetAngle = Math.atan2(mouseWorld.y - this.y, mouseWorld.x - this.x);
+      
+      let angleDiff = targetAngle - this.angle;
+      while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+      while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+      this.angle += Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), this.turnSpeed * dt * 1.5);
+      
+      throttle = 1.0;
     }
 
     // Forward drive vector direction

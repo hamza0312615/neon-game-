@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>NEON CIRCUIT — Advanced Top-Down Combat</title>
@@ -12,7 +15,7 @@
   </head>
   <body>
     <div id="game-container">
-      <canvas id="game-canvas"></canvas>
+      <canvas id="game-canvas" tabindex="0"></canvas>
 
       <!-- UI OVERLAY -->
       <div id="ui-container">
@@ -24,7 +27,7 @@
             <p class="neon-subtitle">🏎️ HIGH-OCTANE CYBER COMBAT 💥</p>
           </div>
           <div class="menu-car-preview">
-            <div class="car-wireframe"></div>
+            <canvas id="menu-car-canvas" width="220" height="140"></canvas>
           </div>
           <div class="menu-buttons">
             <button id="btn-play" class="neon-btn btn-primary"><span>🎮 START COMBAT</span></button>
@@ -271,6 +274,14 @@
               <label>🔢 DAMAGE NUMBERS</label>
               <input type="checkbox" id="setting-damage-nums" checked>
             </div>
+            <div class="setting-row">
+              <label>👁️ COLORBLIND THREAT MARKS</label>
+              <input type="checkbox" id="setting-colorblind">
+            </div>
+            <div class="setting-row">
+              <label>⚡ REDUCE FLASHING & SHAKE</label>
+              <input type="checkbox" id="setting-photosensitive">
+            </div>
           </div>
           <button id="btn-settings-back" class="neon-btn"><span>💾 SAVE & RETURN</span></button>
         </div>
@@ -282,12 +293,12 @@
             <div class="tutorial-grid">
               <div class="tut-section">
                 <h3>🏎️ DRIVING CONTROLS</h3>
-                <p><strong>W / A / S / D</strong> or <strong>ARROWS</strong> to steer chassis.</p>
+                <p><strong>W / A / S / D</strong> or <strong>ARROWS</strong> or <strong>RIGHT-CLICK / GAMEPAD</strong>.</p>
                 <p>Accelerate, decelerate, and drift hard around corners to build energy.</p>
               </div>
               <div class="tut-section">
                 <h3>🎯 TARGETING SYSTEM</h3>
-                <p>Use <strong>MOUSE</strong> or <strong>TOUCH</strong> to aim turret.</p>
+                <p>Use <strong>MOUSE</strong>, <strong>TOUCH</strong>, or <strong>GAMEPAD STICK</strong> to aim turret.</p>
                 <p>Hold <strong>LEFT CLICK</strong> or <strong>SPACE</strong> to unleash fire.</p>
               </div>
               <div class="tut-section">
@@ -343,6 +354,7 @@
           </div>
           <div class="menu-buttons">
             <button id="btn-gameover-retry" class="neon-btn btn-primary"><span>🔄 DEPLOY AGAIN</span></button>
+            <button id="btn-gameover-share" class="neon-btn"><span>📸 SHARE SCORE CARD</span></button>
             <button id="btn-gameover-garage" class="neon-btn"><span>🏎️ GARAGE</span></button>
             <button id="btn-gameover-menu" class="neon-btn"><span>🏠 MAIN MENU</span></button>
           </div>
@@ -359,7 +371,8 @@
             <div class="stat-row"><span>🎁 COMPLETION BONUS</span><span class="val">+5,000 🪙</span></div>
           </div>
           <div class="menu-buttons">
-            <button id="btn-victory-garage" class="neon-btn btn-primary"><span>🏎️ UPGRADE VEHICLE</span></button>
+            <button id="btn-victory-share" class="neon-btn btn-primary"><span>📸 SHARE SCORE CARD</span></button>
+            <button id="btn-victory-garage" class="neon-btn"><span>🏎️ UPGRADE VEHICLE</span></button>
             <button id="btn-victory-menu" class="neon-btn"><span>🏠 MAIN MENU</span></button>
           </div>
         </div>

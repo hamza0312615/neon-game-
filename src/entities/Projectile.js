@@ -292,7 +292,7 @@ export class Projectile {
       ctx.rotate(angle);
       
       ctx.fillStyle = '#0f0f18';
-      ctx.strokeStyle = 'var(--neon-yellow)';
+      ctx.strokeStyle = resolveColor('var(--neon-yellow)');
       ctx.lineWidth = 1.5;
       
       // Small rectangle rocket body
@@ -300,11 +300,11 @@ export class Projectile {
       ctx.strokeRect(-6, -3, 12, 6);
       
       // Red fin tips
-      ctx.fillStyle = 'var(--neon-red)';
+      ctx.fillStyle = resolveColor('var(--neon-red)');
       ctx.fillRect(-8, -4, 2, 8);
       
       // Nose cone
-      ctx.fillStyle = 'var(--neon-yellow)';
+      ctx.fillStyle = resolveColor('var(--neon-yellow)');
       ctx.beginPath();
       ctx.moveTo(6, -3);
       ctx.lineTo(10, 0);
