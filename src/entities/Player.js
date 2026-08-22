@@ -707,6 +707,7 @@ export class Player {
       const rot = Date.now() * 0.004;
       ctx.rotate(rot);
 
+      const colorMagenta = resolveColor('var(--neon-magenta)');
       ctx.strokeStyle = colorMagenta;
       ctx.lineWidth = 2;
       ctx.shadowBlur = this.game.saveData.settings.glowEnabled ? 12 : 0;
