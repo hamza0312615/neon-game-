@@ -11,6 +11,8 @@ export class Input {
     this.boostBtn = { active: false };
     this.swapBtn = { active: false };
 
+    this.gamepadState = { accelerating: false, reversing: false, turningLeft: false, turningRight: false, shooting: false, boosting: false };
+
     this.setupListeners();
   }
 
@@ -204,27 +206,32 @@ export class Input {
 
   isAccelerating() {
     this.updateGamepad();
-    return !!(this.keys['w'] || this.keys['W'] || this.keys['KeyW'] || this.keys['keyw'] || this.keys['arrowup'] || this.keys['ArrowUp'] || (this.joystick.active && this.joystick.vy < -0.2) || this.gamepadState.accelerating);
+    return !!(this.keys['w'] || this.keys['W'] || this.keys['KeyW'] || this.keys['keyw'] || this.keys['arrowup'] || this.keys['ArrowUp'] || (this.joystick.active && this.joystick.vy < -0.2) || this.gamepadState?.accelerating);
   }
 
   isReversing() {
-    return !!(this.keys['s'] || this.keys['S'] || this.keys['KeyS'] || this.keys['keys'] || this.keys['arrowdown'] || this.keys['ArrowDown'] || (this.joystick.active && this.joystick.vy > 0.2) || this.gamepadState.reversing);
+    this.updateGamepad();
+    return !!(this.keys['s'] || this.keys['S'] || this.keys['KeyS'] || this.keys['keys'] || this.keys['arrowdown'] || this.keys['ArrowDown'] || (this.joystick.active && this.joystick.vy > 0.2) || this.gamepadState?.reversing);
   }
 
   isTurningLeft() {
-    return !!(this.keys['a'] || this.keys['KeyA'] || this.keys['keya'] || this.keys['arrowleft'] || this.keys['ArrowLeft'] || (this.joystick.active && this.joystick.vx < -0.2) || this.gamepadState.turningLeft);
+    this.updateGamepad();
+    return !!(this.keys['a'] || this.keys['KeyA'] || this.keys['keya'] || this.keys['arrowleft'] || this.keys['ArrowLeft'] || (this.joystick.active && this.joystick.vx < -0.2) || this.gamepadState?.turningLeft);
   }
 
   isTurningRight() {
-    return !!(this.keys['d'] || this.keys['KeyD'] || this.keys['keyd'] || this.keys['arrowright'] || this.keys['ArrowRight'] || (this.joystick.active && this.joystick.vx > 0.2) || this.gamepadState.turningRight);
+    this.updateGamepad();
+    return !!(this.keys['d'] || this.keys['KeyD'] || this.keys['keyd'] || this.keys['arrowright'] || this.keys['ArrowRight'] || (this.joystick.active && this.joystick.vx > 0.2) || this.gamepadState?.turningRight);
   }
 
   isShooting() {
-    return !!(this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.keys['Space'] || this.shootBtn.active || this.gamepadState.shooting);
+    this.updateGamepad();
+    return !!(this.mouse.isDown || this.keys[' '] || this.keys['space'] || this.keys['Space'] || this.shootBtn.active || this.gamepadState?.shooting);
   }
 
   isBoosting() {
-    return !!(this.keys['shift'] || this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.keys['shiftleft'] || this.keys['shiftright'] || this.boostBtn.active || this.gamepadState.boosting);
+    this.updateGamepad();
+    return !!(this.keys['shift'] || this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.keys['shiftleft'] || this.keys['shiftright'] || this.boostBtn.active || this.gamepadState?.boosting);
   }
 
   isPausePressed() {

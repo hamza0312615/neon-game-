@@ -2,6 +2,7 @@ import { Input } from './Input.js';
 import { Camera } from './Camera.js';
 import { SaveSystem } from './SaveSystem.js';
 import { AudioManager } from './AudioManager.js';
+import { resolveColor } from './Colors.js';
 import { Player } from '../entities/Player.js';
 import { Arena } from '../world/Arena.js';
 import { WaveManager } from '../world/WaveManager.js';
@@ -151,6 +152,7 @@ export class Game {
     });
     bindBtn('btn-restart', () => this.startGame());
     bindBtn('btn-abort', () => {
+      this.saveCurrentProgression();
       this.audio.stopMusic();
       this.changeState('MENU');
     });
@@ -399,7 +401,11 @@ export class Game {
     }
     
     if (newState === 'GARAGE') {
+      this.saveCurrentProgression();
       this.populateGarageScreen();
+    }
+    if (newState === 'MENU') {
+      this.saveCurrentProgression();
     }
 
     if (newState === 'SETTINGS') {
@@ -453,6 +459,7 @@ export class Game {
     
     // Run short wave start warning
     this.waveManager.startWave();
+    this.updateHUD();
 
     // Trigger interactive tutorial for new players
     const tutOverlay = document.getElementById('tutorial-overlay');
@@ -533,28 +540,31 @@ export class Game {
     });
   }
 
+  saveCurrentProgression() {
+    if (this.creditsEarned > 0) {
+      this.saveData.progression.credits += this.creditsEarned;
+      this.creditsEarned = 0;
+    }
+    if (this.score > this.saveData.progression.bestScore) {
+      this.saveData.progression.bestScore = this.score;
+    }
+    if (this.waveManager && this.waveManager.waveNumber > this.saveData.progression.highestWave) {
+      this.saveData.progression.highestWave = this.waveManager.waveNumber;
+    }
+    SaveSystem.save(this.saveData);
+    this.updateMenuStats();
+  }
+
   handleGameOver() {
     this.audio.stopMusic();
     this.audio.playExplosion(true);
     
-    // Save credits and highscore
-    const totalCredits = this.saveData.progression.credits + this.creditsEarned;
-    this.saveData.progression.credits = totalCredits;
-    
-    if (this.score > this.saveData.progression.bestScore) {
-      this.saveData.progression.bestScore = this.score;
-    }
-    
-    if (this.waveManager.waveNumber > this.saveData.progression.highestWave) {
-      this.saveData.progression.highestWave = this.waveManager.waveNumber;
-    }
-    
-    // Update lifetime stats
+    // Save credits, highscore, and lifetime stats
     this.saveData.statistics.totalKills += this.kills;
     this.saveData.statistics.totalSurvivalTime += this.survivalTime;
     this.saveData.statistics.runsCount += 1;
     
-    SaveSystem.save(this.saveData);
+    this.saveCurrentProgression();
     
     // Populate Game Over screen
     document.getElementById('stat-waves').innerText = this.waveManager.waveNumber;
@@ -1022,6 +1032,16 @@ export class Game {
         label: isHealth ? '✚ REPAIR' : '⚡ CHARGE',
         color: isHealth ? 'var(--neon-green)' : 'var(--neon-yellow)'
       });
+    }
+
+    // 3. Track remaining hostiles (when 5 or fewer remain, show red threat pointers so player can easily locate them!)
+    if (this.enemies.length > 0 && this.enemies.length <= 5) {
+      for (let e of this.enemies) {
+        if (e.isDead) continue;
+        if (!targets.some(t => t.x === e.x && t.y === e.y)) {
+          targets.push({ x: e.x, y: e.y, label: '👾 TARGET', color: 'var(--neon-red)' });
+        }
+      }
     }
 
     targets.forEach(t => {

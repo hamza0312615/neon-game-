@@ -53,12 +53,25 @@ export class SaveSystem {
       const parsed = JSON.parse(dataStr);
       const defaults = this.getDefaults();
       
+      const upgrades = { ...defaults.progression.upgrades, ...(parsed.progression?.upgrades || {}) };
+      for (let k in defaults.progression.upgrades) {
+        const val = parseInt(upgrades[k]);
+        upgrades[k] = isNaN(val) ? 1 : Math.max(1, Math.min(10, val));
+      }
+
+      const credits = parseInt(parsed.progression?.credits);
+      const bestScore = parseInt(parsed.progression?.bestScore);
+      const highestWave = parseInt(parsed.progression?.highestWave);
+
       return {
         settings: { ...defaults.settings, ...(parsed.settings || {}) },
         progression: {
           ...defaults.progression,
           ...(parsed.progression || {}),
-          upgrades: { ...defaults.progression.upgrades, ...(parsed.progression?.upgrades || {}) }
+          credits: isNaN(credits) ? 0 : Math.max(0, credits),
+          bestScore: isNaN(bestScore) ? 0 : Math.max(0, bestScore),
+          highestWave: isNaN(highestWave) ? 1 : Math.max(1, highestWave),
+          upgrades
         },
         statistics: { ...defaults.statistics, ...(parsed.statistics || {}) }
       };

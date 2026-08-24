@@ -21,6 +21,10 @@ export class WaveManager {
   }
 
   reset() {
+    if (this.waveTimeout) {
+      clearTimeout(this.waveTimeout);
+      this.waveTimeout = null;
+    }
     this.waveNumber = 1;
     this.enemiesToSpawn = 0;
     this.spawnQueue = [];
@@ -31,6 +35,10 @@ export class WaveManager {
   }
 
   startWave() {
+    if (this.waveTimeout) {
+      clearTimeout(this.waveTimeout);
+      this.waveTimeout = null;
+    }
     this.waveActive = true;
     this.spawnQueue = [];
     this.game.audio.playWaveStart();
@@ -71,8 +79,8 @@ export class WaveManager {
       alertTitle.innerText = `WAVE ${this.waveNumber}`;
       
       // Procedural filler queue based on wave level (increased spawn count)
-      const gruntCount = Math.round(5 + this.waveNumber * 2.4);
-      const droneCount = Math.max(0, -1 + this.waveNumber);
+      const gruntCount = Math.round(8 + this.waveNumber * 2.6);
+      const droneCount = Math.max(1, Math.floor(this.waveNumber * 1.2));
       const tankCount = this.waveNumber >= 3 ? Math.floor(this.waveNumber / 2.5) : 0;
       const sniperCount = this.waveNumber >= 4 ? Math.floor(this.waveNumber / 3.0) : 0;
       const strikerCount = this.waveNumber >= 5 ? Math.floor(this.waveNumber / 4.0) : 0;
@@ -218,12 +226,18 @@ export class WaveManager {
     }
 
     // 2. Check for wave completion
+    this.game.enemies = this.game.enemies.filter(e => !e.isDead);
     if (this.spawnQueue.length === 0 && this.game.enemies.length === 0) {
       this.waveActive = false;
       this.waveNumber++;
       
-      // Delay wave start to let player catch breath
-      setTimeout(() => {
+      // Auto-commit progression & save to localStorage on wave clear
+      if (this.game) {
+        this.game.saveCurrentProgression();
+      }
+
+      if (this.waveTimeout) clearTimeout(this.waveTimeout);
+      this.waveTimeout = setTimeout(() => {
         this.startWave();
       }, 3500);
     }

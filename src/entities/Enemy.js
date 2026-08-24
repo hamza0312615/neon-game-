@@ -160,6 +160,15 @@ export class Enemy {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
 
+    // Clamp coordinates inside Arena borders so enemies never get lost outside map bounds
+    const margin = this.radius + 15;
+    const arenaW = this.game?.arena?.width || 5000;
+    const arenaH = this.game?.arena?.height || 5000;
+    if (this.x < margin) { this.x = margin; this.vx = Math.abs(this.vx); }
+    if (this.x > arenaW - margin) { this.x = arenaW - margin; this.vx = -Math.abs(this.vx); }
+    if (this.y < margin) { this.y = margin; this.vy = Math.abs(this.vy); }
+    if (this.y > arenaH - margin) { this.y = arenaH - margin; this.vy = -Math.abs(this.vy); }
+
     // Point facing angle towards movement direction
     if (Math.hypot(this.vx, this.vy) > 10) {
       this.angle = Math.atan2(this.vy, this.vx);

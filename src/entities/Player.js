@@ -109,7 +109,10 @@ export class Player {
   }
 
   initStats() {
-    const getVal = (cat, base, step) => base + (this.upgrades[cat] - 1) * step;
+    const getVal = (cat, base, step) => {
+      const lvl = Math.max(1, parseInt(this.upgrades?.[cat]) || 1);
+      return base + (lvl - 1) * step;
+    };
 
     // Max HP: Lvl 1 = 100, Lvl 10 = 235
     this.maxHp = getVal('armor', 100, 15);
@@ -288,7 +291,7 @@ export class Player {
     for (let key in this.powerups) {
       if (this.powerups[key] > 0) {
         this.powerups[key] = Math.max(0, this.powerups[key] - dt);
-        if (key === 'overdrive' && this.powerups[overdrive] === 0) {
+        if (key === 'overdrive' && this.powerups['overdrive'] === 0) {
           this.maxSpeed = this.baseMaxSpeed * this.speedMultiplier;
         }
       }
@@ -328,7 +331,7 @@ export class Player {
         this.isBoosting = false;
         this.boostCooldown = 2.0; // penalty cooldown for draining it fully
         this.game.audio.playBoost(false);
-        this.camera.targetZoom = 1.0;
+        this.game.camera.targetZoom = 1.0;
       }
     } else {
       if (this.isBoosting) {
